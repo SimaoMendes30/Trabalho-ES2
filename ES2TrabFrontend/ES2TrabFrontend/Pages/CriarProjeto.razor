@@ -1,0 +1,99 @@
+﻿@page "/criar-projeto"
+@inject NavigationManager NavigationManager
+@inject ES2TrabFrontend.Services.ProjetoService ProjetoService
+
+@using ES2TrabFrontend.Models  
+
+<h3>Criar Novo Projeto</h3>
+
+<div class="form-container">
+    <div class="form-group">
+        <label>Nome</label>
+        <input @bind="NovoProjetoModel.Nome" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Nome do Cliente</label>
+        <input @bind="NovoProjetoModel.NomeCliente" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Descrição</label>
+        <textarea @bind="NovoProjetoModel.Descricao" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Preço por Hora</label>
+        <input type="number" @bind="NovoProjetoModel.PrecoHora" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>ID do Utilizador</label>
+        <input type="number" @bind="NovoProjetoModel.IdUtilizador" class="form-control" />
+    </div>
+
+    <!-- 🔥 Botões lado a lado e com cor de login -->
+    <div class="d-flex justify-content-center gap-2 mt-3">
+        <button class="btn btn-orange btn-sm px-4 py-2" @onclick="CriarNovoProjeto">Criar Projeto</button>
+        <button class="btn btn-orange-outline btn-sm px-4 py-2" @onclick="VoltarParaMenu">Voltar ao Menu</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(MensagemErro))
+    {
+        <p class="text-danger mt-2">@MensagemErro</p>
+    }
+
+    @if (ProjetoCriado)
+    {
+        <div class="alert alert-success mt-3">
+            Projeto criado com sucesso! Redirecionando...
+        </div>
+    }
+</div>
+
+@code {
+    private ES2TrabFrontend.Models.ProjetoDTO NovoProjetoModel = new ES2TrabFrontend.Models.ProjetoDTO();
+    private string? MensagemErro;
+    private bool ProjetoCriado = false;
+
+    private async Task CriarNovoProjeto()
+    {
+        try
+        {
+            if (NovoProjetoModel.IdUtilizador <= 0)
+            {
+                MensagemErro = "ID do Utilizador é obrigatório.";
+                return;
+            }
+
+            Console.WriteLine($"Enviando projeto: {NovoProjetoModel.Nome}, Cliente: {NovoProjetoModel.NomeCliente}, Preço: {NovoProjetoModel.PrecoHora}, ID Utilizador: {NovoProjetoModel.IdUtilizador}");
+
+            var response = await ProjetoService.CreateProjetoAsync(NovoProjetoModel);
+
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Projeto criado com sucesso!");
+                ProjetoCriado = true;
+                MensagemErro = null;
+                await Task.Delay(2000);
+                NavigationManager.NavigateTo("/menu"); // 🔥 Após criação, volta ao menu
+            }
+            else
+            {
+                string responseContent = await response.Content.ReadAsStringAsync();
+                MensagemErro = $"Erro ao criar o projeto. Código: {response?.StatusCode}. Detalhes: {responseContent}";
+                Console.WriteLine($"Erro na requisição: {response?.StatusCode} - {responseContent}");
+            }
+        }
+        catch (Exception ex)
+        {
+            MensagemErro = $"Erro inesperado: {ex.Message}";
+            Console.WriteLine($"Erro inesperado: {ex.Message}");
+        }
+    }
+
+    private void VoltarParaMenu()
+    {
+        NavigationManager.NavigateTo("/menu");
+    }
+}

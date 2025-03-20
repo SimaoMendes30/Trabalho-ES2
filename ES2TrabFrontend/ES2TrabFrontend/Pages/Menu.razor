@@ -1,0 +1,29 @@
+﻿@page "/menu"
+@inject NavigationManager NavigationManager
+
+<h3>Menu Principal</h3>
+
+<div class="menu">
+    <div class="menu-item btn-menu" @onclick="IrParaCriarProjeto">Criar Projeto</div>
+    <div class="menu-item btn-menu" @onclick="OnClickAção2">Ação 2</div>
+    <div class="menu-item btn-menu" @onclick="OnClickAção3">Ação 3</div>
+    <div class="menu-item btn-menu" @onclick="OnClickAção4">Ação 4</div>
+    <button class="btn btn-logout" @onclick="Logout">Sair</button>
+</div>
+
+@code {
+    private void IrParaCriarProjeto()
+    {
+        NavigationManager.NavigateTo("/criar-projeto"); 
+    }
+
+    private void OnClickAção2() => Console.WriteLine("Executando Ação 2");
+    private void OnClickAção3() => Console.WriteLine("Executando Ação 3");
+    private void OnClickAção4() => Console.WriteLine("Executando Ação 4");
+
+    private void Logout()
+    {
+        Console.WriteLine("Logout efetuado!");
+        NavigationManager.NavigateTo("/login");
+    }
+}

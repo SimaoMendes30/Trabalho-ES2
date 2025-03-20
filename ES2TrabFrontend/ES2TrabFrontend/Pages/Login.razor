@@ -1,0 +1,76 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Components
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService 
+
+<h3>Login</h3>
+
+<EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="usernameInput">Nome de usuário:</label>
+        <input id="usernameInput" @bind="loginModel.Username" class="form-control" />
+        <ValidationMessage For="@(() => loginModel.Username)" />
+    </div>
+
+    <div>
+        <label for="passwordInput">Senha:</label>
+        <input id="passwordInput" type="password" @bind="loginModel.Password" class="form-control" />
+        <ValidationMessage For="@(() => loginModel.Password)" />
+    </div>
+
+    <!-- Botão "Entrar" -->
+    <button type="submit" class="btn btn-login">Entrar</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p class="text-danger">@errorMessage</p>
+}
+
+<!-- Botão menor para "Criar nova conta" -->
+<div class="register-container">
+    <p>Não tem conta?</p>
+    <button class="btn btn-register" @onclick="NavigateToRegister">Criar nova conta</button>
+</div>
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+    private string errorMessage = string.Empty;
+
+    private async Task HandleLogin()
+    {
+        Console.WriteLine($"🔹 Username recebido: '{loginModel.Username}'");
+        Console.WriteLine($"🔹 Password recebida: '{loginModel.Password}'");
+
+        bool isValidUser = await AuthService.ValidateUserAsync(loginModel.Username, loginModel.Password);
+
+        if (isValidUser)
+        {
+            Console.WriteLine("✅ Login bem-sucedido! Redirecionando...");
+            NavigationManager.NavigateTo("/menu");
+        }
+        else
+        {
+            Console.WriteLine("❌ Credenciais inválidas!");
+            errorMessage = "Utilizador ou senha incorretos.";
+        }
+    }
+
+    private void NavigateToRegister()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "O nome de usuário é obrigatório")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "A senha é obrigatória")]
+        public string Password { get; set; } = string.Empty;
+    }
+}
