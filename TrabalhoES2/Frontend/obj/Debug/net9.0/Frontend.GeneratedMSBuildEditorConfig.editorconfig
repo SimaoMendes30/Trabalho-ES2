@@ -1,0 +1,116 @@
+is_global = true
+build_property.EnableAotAnalyzer = 
+build_property.EnableSingleFileAnalyzer = 
+build_property.EnableTrimAnalyzer = false
+build_property.IncludeAllContentForSelfExtract = 
+build_property.MudDebugAnalyzer = 
+build_property.MudAllowedAttributePattern = 
+build_property.MudAllowedAttributeList = 
+build_property.TargetFramework = net9.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = Frontend
+build_property.RootNamespace = Frontend
+build_property.ProjectDir = C:\Users\User\Desktop\ESII_SGSC\Frontend\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = false
+build_property.RazorLangVersion = 9.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\User\Desktop\ESII_SGSC\Frontend
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 9.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Layout/DashboardLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XERhc2hib2FyZExheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/AlterarProjeto.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWx0ZXJhclByb2pldG8ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Conta.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29udGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/ContaEditar.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29udGFFZGl0YXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/CriarProjeto.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3JpYXJQcm9qZXRvLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/DefinirPrecoTarefa.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVmaW5pclByZWNvVGFyZWZhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/DetalhesProjeto.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGV0YWxoZXNQcm9qZXRvLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/EliminarProjeto.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRWxpbWluYXJQcm9qZXRvLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Menu.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/ProjetosMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvamV0b3NNZW51LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/TarefaIniciar.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGFyZWZhSW5pY2lhci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/TarefasMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGFyZWZhc01lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Layout/HomeLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XEhvbWVMYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-zq8z4w347q
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Layout/LoginLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XExvZ2luTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-z6chrzzod1
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-yxi2lmzgn0
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Layout/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-fpiqm1rjhp
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Layout/RegisterLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XFJlZ2lzdGVyTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-gmx8mzyycb

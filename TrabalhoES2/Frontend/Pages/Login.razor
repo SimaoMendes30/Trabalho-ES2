@@ -1,0 +1,70 @@
+﻿@page "/login"
+@layout LoginLayout
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@using Frontend.DTO_s
+
+<EditForm Model="loginDTO" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="login-card text-center">
+        <img src="/images/helpmate-logo2.png" alt="HelpMate Logo" class="img-fluid mb-4" style="max-width: 100px;" />
+
+        <div class="mb-3 text-start">
+            <InputText id="username" class="form-control" @bind-Value="loginDTO.Username" placeholder="Username" />
+        </div>
+
+        <div class="mb-3 text-start">
+            <InputText id="password" type="password" class="form-control" @bind-Value="loginDTO.Password" placeholder="Senha" />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <p class="text-danger mt-3">@errorMessage</p>
+        }
+    </div>
+</EditForm>
+
+@code {
+    private LoginDTO loginDTO = new();
+    private string errorMessage = string.Empty;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/login", loginDTO);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var jsonDoc = System.Text.Json.JsonDocument.Parse(json);
+                int userId = jsonDoc.RootElement.GetProperty("userId").GetInt32();
+
+                // Verifica se é válido
+                if (userId > 0)
+                {
+                    await JSRuntime.InvokeVoidAsync("localStorage.setItem", "userId", userId.ToString());
+                    Navigation.NavigateTo("/menu");
+                }
+                else
+                {
+                    errorMessage = "ID do utilizador inválido.";
+                }
+            }
+            else
+            {
+                errorMessage = "Utilizador ou senha incorretos.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erro ao fazer login: {ex.Message}";
+        }
+    }
+
+    private void NavigateToRegister() => Navigation.NavigateTo("/register");
+}

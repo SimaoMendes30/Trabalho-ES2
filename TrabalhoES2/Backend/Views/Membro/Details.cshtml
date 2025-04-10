@@ -1,0 +1,63 @@
+@model Backend.Models.Membro
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+<body>
+
+<div>
+    <h4>Membro</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DataConvite)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DataConvite)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DataEstado)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DataEstado)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.EstadoConvite)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EstadoConvite)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.EstadoAtividade)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EstadoAtividade)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Projeto)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Projeto.IdProjeto)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Utilizador)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Utilizador.IdUtilizador)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.IdMembro">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+</body>
+</html>

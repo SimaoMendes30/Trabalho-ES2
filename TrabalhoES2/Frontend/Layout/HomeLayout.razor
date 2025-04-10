@@ -1,0 +1,48 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+
+<style>
+    .home-layout {
+        background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
+                    url('/images/background2.png') no-repeat center center fixed;
+        background-size: cover;
+        min-height: 100vh;
+    }
+
+    .home-content {
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+        text-align: center;
+        color: #000;
+    }
+
+    .home-header {
+        background-color: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<!-- Layout -->
+<div class="home-layout">
+
+    <!-- Cabeçalho com logo e botões -->
+    <header class="home-header d-flex justify-content-between align-items-center px-4 py-3">
+        <img src="/images/helpmate-logo2.png" alt="HelpMate Logo" style="height: 60px;" />
+
+        <div>
+            <button class="btn btn-outline-primary me-2" @onclick="IrParaRegisto">Criar Conta</button>
+            <button class="btn btn-primary" @onclick="IrParaLogin">Entrar</button>
+        </div>
+    </header>
+
+    <!-- Conteúdo principal -->
+    <main class="home-content container-fluid">
+        @Body
+    </main>
+
+</div>
+
+@code {
+    void IrParaLogin() => Navigation.NavigateTo("/login");
+    void IrParaRegisto() => Navigation.NavigateTo("/register");
+}

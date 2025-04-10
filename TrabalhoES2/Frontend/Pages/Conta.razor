@@ -1,0 +1,92 @@
+﻿@page "/conta"
+@layout DashboardLayout
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+@using Frontend.DTO_s
+
+<div class="menu-page">
+    <h2 class="title">👤 Conta</h2>
+
+    @if (!_carregado)
+    {
+        <p>A carregar os seus dados...</p>
+    }
+    else if (_utilizador is not null)
+    {
+        <div class="mb-4">
+            <p><strong>Nome:</strong> @_utilizador.Nome</p>
+            <p><strong>Username:</strong> @_utilizador.Username</p>
+            <p><strong>Horas Semanais:</strong> @_utilizador.NumHoras</p>
+        </div>
+
+        <button class="menu-btn" @onclick="IrParaEdicao">✏️ Alterar Dados da Conta</button>
+    }
+    else
+    {
+        <div class="alert alert-danger">Não foi possível carregar os dados do utilizador.</div>
+    }
+</div>
+
+<style>
+    .menu-page {
+        padding: 2rem;
+        background-color: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        max-width: 800px;
+        margin: 2rem auto;
+    }
+
+    .title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .menu-btn {
+        padding: 1rem 1.5rem;
+        background-color: #e0e0e0;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: background 0.2s ease;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .menu-btn:hover {
+        background-color: #d0d0d0;
+        cursor: pointer;
+    }
+</style>
+
+@code {
+    UtilizadorDTO? _utilizador;
+    bool _carregado = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var userIdString = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "userId");
+            if (int.TryParse(userIdString, out int userId))
+            {
+                _utilizador = await Http.GetFromJsonAsync<UtilizadorDTO>($"api/utilizador/{userId}");
+            }
+        }
+        catch
+        {
+            _utilizador = null;
+        }
+        finally
+        {
+            _carregado = true;
+        }
+    }
+
+    void IrParaEdicao()
+    {
+        Navigation.NavigateTo("/conta/editar");
+    }
+}

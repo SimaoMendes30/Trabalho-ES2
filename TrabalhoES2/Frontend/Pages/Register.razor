@@ -1,0 +1,93 @@
+﻿@page "/register"
+@layout RegisterLayout
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@using Frontend.DTO_s
+@inject IJSRuntime JSRuntime
+
+<EditForm Model="_novoUtilizador" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="login-card">
+        <img src="/images/helpmate-logo2.png" alt="HelpMate Logo" class="mx-auto d-block mb-3" style="height: 50px;" />
+        <h3 class="text-center mb-4">Criar Conta</h3>
+
+        <div class="mb-3">
+            <InputText class="form-control" @bind-Value="_novoUtilizador.Nome" placeholder="Nome completo" />
+        </div>
+
+        <div class="mb-3">
+            <InputText class="form-control" @bind-Value="_novoUtilizador.Username" placeholder="Username" />
+        </div>
+
+        <div class="mb-3">
+            <InputText class="form-control" type="password" @bind-Value="_password" placeholder="Senha" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tipo de Utilizador</label>
+            <InputSelect class="form-select" @bind-Value="_tipoSelecionado">
+                <option value="">Utilizador Normal</option>
+                <option value="Admin">Admin</option>
+                <option value="UserManager">User Manager</option>
+            </InputSelect>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Criar Conta</button>
+
+        <div class="text-center mt-3">
+            <a @onclick='() => Navigation.NavigateTo("/login")'>Já tem conta? Entrar</a>
+        </div>
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <p class="text-danger text-center mt-3">@_errorMessage</p>
+        }
+        @if (!string.IsNullOrEmpty(_successMessage))
+        {
+            <p class="text-success text-center mt-3">@_successMessage</p>
+        }
+
+    </div>
+</EditForm>
+
+@code {
+    private UtilizadorDTO _novoUtilizador = new();
+    private string _tipoSelecionado = "";
+    private string _password = "";
+    private string _errorMessage = string.Empty;
+    private string _successMessage = string.Empty;
+
+    private async Task HandleRegister()
+    {
+        _errorMessage = string.Empty;
+        _successMessage = string.Empty;
+
+        _novoUtilizador.Admin = _tipoSelecionado == "Admin";
+        _novoUtilizador.SuperUser = _tipoSelecionado == "UserManager";
+        _novoUtilizador.Password = _password;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/Utilizador", _novoUtilizador);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Created)
+            {
+                _successMessage = "Conta criada com sucesso! Pode agora clicar em 'Entrar' para iniciar sessão.";
+            }
+            else
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                _errorMessage = $"Erro ao criar conta: {content}";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Erro: {ex.Message}";
+        }
+    }
+}
+
+
+}

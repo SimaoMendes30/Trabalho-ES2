@@ -1,0 +1,67 @@
+@model IEnumerable<Backend.Models.Tarefa>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Descricao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DataInicio)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DataFim)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Estado)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Responsavel)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Descricao)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DataInicio)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DataFim)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Estado)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Responsavel)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.IdTarefa">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.IdTarefa">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdTarefa">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
