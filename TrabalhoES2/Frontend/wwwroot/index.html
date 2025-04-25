@@ -4,19 +4,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HelpMate</title>
+    <title>Frontend</title>
     <base href="/" />
-
-    <!-- Bootstrap -->
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <!-- Estilos principais -->
     <link rel="stylesheet" href="css/app.css" />
-    <!-- Ícone da aba -->
-    <link rel="icon" type="image/png" href="images/NewFavicon.png" />
-
-    <!-- Estilos gerados pelo Blazor -->
+    <link rel="icon" type="image/png" href="favicon.png" />
     <link href="Frontend.styles.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -29,12 +24,17 @@
 </div>
 
 <div id="blazor-error-ui">
-    Ocorreu um erro inesperado.
-    <a href="." class="reload">Recarregar</a>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
 
+<!-- ✅ Coloca o JS personalizado aqui -->
+<script src="js/theme.js"></script>
+
+<!-- Scripts Blazor (mantenha após o teu js) -->
 <script src="_framework/blazor.webassembly.js"></script>
+<script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>
 
 </html>

@@ -29,6 +29,10 @@
       "PackagePath": "staticwebassets\\images\\Background2.png"
     },
     {
+      "Id": "C:\\Users\\User\\Desktop\\ESII_SGSC\\Frontend\\wwwroot\\images\\darkbackground.jpg",
+      "PackagePath": "staticwebassets\\images\\darkbackground.jpg"
+    },
+    {
       "Id": "C:\\Users\\User\\Desktop\\ESII_SGSC\\Frontend\\wwwroot\\images\\helpmate-logo.png",
       "PackagePath": "staticwebassets\\images\\helpmate-logo.png"
     },
@@ -39,6 +43,10 @@
     {
       "Id": "C:\\Users\\User\\Desktop\\ESII_SGSC\\Frontend\\wwwroot\\index.html",
       "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "C:\\Users\\User\\Desktop\\ESII_SGSC\\Frontend\\wwwroot\\js\\theme.js",
+      "PackagePath": "staticwebassets\\js\\theme.js"
     },
     {
       "Id": "C:\\Users\\User\\Desktop\\ESII_SGSC\\Frontend\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css",

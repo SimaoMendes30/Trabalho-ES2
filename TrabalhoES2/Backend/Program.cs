@@ -1,102 +1,122 @@
+using Backend.AutoMapperProfiles;
 using Backend.Models;
+using Backend.Repositories;
+using Backend.Repositories.Interfaces;
+using Backend.Services;
+using Backend.Services.Interfaces;
+using Backend.Domain.Strategies; // IPrecoTarefaStrategy & DefaultPrecoStrategy
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System.Text.Json.Serialization;
-using Backend.DTO_s;
-using Microsoft.OpenApi.Models; // <- ADICIONAR ISTO
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Adicionar serviços ao container
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-});
+// ─────────────────────────────────────────────────────────────────────────────
+// JWT Authentication
+// ─────────────────────────────────────────────────────────────────────────────
+var jwt = builder.Configuration.GetSection("Jwt");
 
-
-// ✅ Ativar Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        Title = "SGSC API",
-        Version = "v1"
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer           = true,
+            ValidateAudience         = true,
+            ValidateLifetime         = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer              = jwt["Issuer"],
+            ValidAudience            = jwt["Audience"],
+            IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!))
+        };
     });
-});
 
-// Adicionar serviço de logging
-builder.Services.AddLogging(logging =>
-{
-    logging.ClearProviders();
-    logging.AddConsole();
-    logging.AddDebug();
-    logging.SetMinimumLevel(LogLevel.Debug); // Permite logs detalhados
-});
+builder.Services.AddAuthorization();
 
-// Registro do DbContext (PostgreSQL)
-builder.Services.AddDbContext<SgscContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), npgsqlOptions =>
-    {
-        npgsqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 3,
-            maxRetryDelay: TimeSpan.FromSeconds(10),
-            errorCodesToAdd: null
-        );
-    })
-    .EnableSensitiveDataLogging() // Logs detalhados para debug
-    .LogTo(Console.WriteLine, LogLevel.Information);
-});
+// ─────────────────────────────────────────────────────────────────────────────
+// DbContext
+// ─────────────────────────────────────────────────────────────────────────────
+builder.Services.AddDbContextFactory<sgscDbContext>(opts =>
+    opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configuração de CORS
+// ─────────────────────────────────────────────────────────────────────────────
+// Repositories (DI)
+// ─────────────────────────────────────────────────────────────────────────────
+builder.Services.AddScoped<IUtilizadorRepository, UtilizadorRepository>();
+builder.Services.AddScoped<IProjetoRepository   , ProjetoRepository>();
+builder.Services.AddScoped<IMembroRepository    , MembroRepository>();
+builder.Services.AddScoped<ITarefaRepository    , TarefaRepository>();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Domain Strategies / Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+builder.Services.AddScoped<IPrecoTarefaStrategy, DefaultPrecoStrategy>();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Services (DI)
+// ─────────────────────────────────────────────────────────────────────────────
+builder.Services.AddScoped<IUtilizadorService, UtilizadorService>();
+builder.Services.AddScoped<IProjetoService   , ProjetoService>();
+builder.Services.AddScoped<IMembroService    , MembroService>();
+builder.Services.AddScoped<ITarefaService    , TarefaService>();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AutoMapper & Controllers
+// ─────────────────────────────────────────────────────────────────────────────
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddControllers();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CORS - registrar antes do Build
+// ─────────────────────────────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
+    options.AddPolicy("Frontend", policy =>
+        policy
+            .WithOrigins("http://localhost:5267") // ou "https://localhost:5267" se o SPA usar HTTPS
+            .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
+            .AllowCredentials()
+    );
 });
 
-// AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+// ─────────────────────────────────────────────────────────────────────────────
+// Swagger
+// ─────────────────────────────────────────────────────────────────────────────
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Logging
+// ─────────────────────────────────────────────────────────────────────────────
+builder.Logging.AddConsole();
 
 var app = builder.Build();
 
-// ✅ Middleware Swagger (visível apenas em Development por segurança)
+// ─────────────────────────────────────────────────────────────────────────────
+// Middleware pipeline
+// ─────────────────────────────────────────────────────────────────────────────
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "SGSC API v1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+        c.RoutePrefix = "swagger";
+    });
+
+    app.MapGet("/", ctx =>
+    {
+        ctx.Response.Redirect("/swagger");
+        return Task.CompletedTask;
     });
 }
 
-// Middleware de tratamento global de exceções
-app.UseExceptionHandler(config =>
-{
-    config.Run(async context =>
-    {
-        context.Response.StatusCode = 500;
-        context.Response.ContentType = "application/json";
-        var exception = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
-        if (exception != null)
-        {
-            var logger = app.Services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(exception, "Erro inesperado no servidor.");
-
-            await context.Response.WriteAsJsonAsync(new { message = "Erro interno do servidor", details = exception.Message });
-        }
-    });
-});
-
-// Pipeline HTTP
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseCors("AllowAll");
+app.UseCors("Frontend");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

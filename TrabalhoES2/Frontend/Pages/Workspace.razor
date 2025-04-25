@@ -1,0 +1,45 @@
+﻿@page "/workspace"
+@using MudBlazor
+@inject IDialogService DialogService     
+@inject ILogger<Workspace> Logger
+@layout WorkspaceLayout
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               OnClick="OpenDialogAsync">
+        Abrir diálogo
+    </MudButton>
+</MudContainer>
+
+@code {
+    private async Task OpenDialogAsync()
+    {
+        Logger.LogInformation("Início de OpenDialogAsync()");
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick    = true
+        };
+
+        Logger.LogInformation("A abrir diálogo com Test.razor");
+        var dialogRef = await DialogService.ShowAsync<Test>(
+            title: "Diálogo simples",
+            parameters: null,
+            options: options     // ← nomeado para evitar sobrecarga errada
+        );
+
+        Logger.LogInformation("DialogReference obtida, a aguardar resultado…");
+        var result = await dialogRef.Result;
+
+        if (result.Canceled)
+        {
+            Logger.LogInformation("Utilizador cancelou o diálogo.");
+            return;
+        }
+
+        Logger.LogInformation("Diálogo confirmado: {Data}", result.Data);
+        await DialogService.ShowMessageBox("Resultado", $"Recebi: {result.Data}");
+    }
+}

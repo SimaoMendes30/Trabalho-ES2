@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Backend.Models;
 
@@ -20,9 +19,7 @@ public partial class Membro
 
     public string? EstadoAtividade { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public virtual Projeto Projeto { get; set; } = null!;
+    public virtual Projeto IdProjetoNavigation { get; set; } = null!;
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public virtual Utilizador Utilizador { get; set; } = null!;
+    public virtual Utilizador IdUtilizadorNavigation { get; set; } = null!;
 }

@@ -1,41 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Frontend.DTO_s;
+﻿using Frontend.DTOs.Projetos;
+using System.Net.Http.Json;
 
-namespace Frontend.Services
+namespace Frontend.Services;
+
+public class ProjetoService : ApiService
 {
-    public class ProjetoService
-    {
-        private readonly ApiService _apiService;
+    public ProjetoService(IHttpClientFactory f) : base(f) { }
 
-        public ProjetoService(ApiService apiService)
-        {
-            _apiService = apiService;
-        }
+    public Task<ProjetoDto?> GetAsync(int id) => GetAsync<ProjetoDto>($"api/projeto/{id}");
 
-        public async Task<List<ProjetoDTO>> GetProjetosAsync()
-        {
-            return await _apiService.GetAsync<List<ProjetoDTO>>("api/projeto");
-        }
+    public Task<IEnumerable<ProjetoDto>?> ListByUserAsync(int utilizadorId) =>
+        GetAsync<IEnumerable<ProjetoDto>>($"api/projeto/utilizador/{utilizadorId}");
 
-        public async Task<ProjetoDTO> GetProjetoByIdAsync(int id)
-        {
-            return await _apiService.GetAsync<ProjetoDTO>($"api/projeto/{id}");
-        }
+    public async Task<bool> CreateAsync(ProjetoCreateDto dto)
+        => (await PostAsync("api/projeto", dto)).IsSuccessStatusCode;
 
-        public async Task<ProjetoDTO> CreateProjetoAsync(ProjetoDTO projetoDTO)
-        {
-            return await _apiService.PostAsync("api/projeto", projetoDTO);
-        }
+    public Task<bool> UpdateAsync(int id, UpdateProjetoDto dto) =>
+        PutAsync($"api/projeto/{id}", dto).ContinueWith(t => t.Result.IsSuccessStatusCode);
 
-        public async Task UpdateProjetoAsync(int id, ProjetoDTO projetoDTO)
-        {
-            await _apiService.PutAsync($"api/projeto/{id}", projetoDTO);
-        }
-
-        public async Task DeleteProjetoAsync(int id)
-        {
-            await _apiService.DeleteAsync($"api/projeto/{id}");
-        }
-    }
+    public Task<bool> DeleteAsync(int id) =>
+        DeleteAsync($"api/projeto/{id}").ContinueWith(t => t.Result.IsSuccessStatusCode);
 }

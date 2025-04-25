@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Backend.Models;
 
@@ -19,11 +18,10 @@ public partial class Utilizador
     public bool Admin { get; set; }
 
     public bool SuperUser { get; set; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+
     public virtual ICollection<Membro> Membros { get; set; } = new List<Membro>();
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+
     public virtual ICollection<Projeto> Projetos { get; set; } = new List<Projeto>();
-    
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public virtual ICollection<Tarefa> Tarefas { get; set; } = new List<Tarefa>();
+
+    public virtual ICollection<Tarefa> IdTarefas { get; set; } = new List<Tarefa>();
 }

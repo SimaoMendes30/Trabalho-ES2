@@ -1,73 +1,43 @@
-﻿using Frontend.DTO_s;
+﻿using Frontend.DTOs.Tarefas;
 using System.Net.Http.Json;
 
-namespace Frontend.Services
+namespace Frontend.Services;
+
+public class TarefaService : ApiService
 {
-    public class TarefaService
+    public TarefaService(IHttpClientFactory f) : base(f) { }
+
+    public async Task<TarefaDto?> StartAsync(StartTarefaDto dto)
     {
-        private readonly HttpClient _httpClient;
-
-        public TarefaService(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-
-        // Obter todas as tarefas
-        public async Task<List<TarefaDTO>> GetTarefasAsync()
-        {
-            var response = await _httpClient.GetAsync("api/tarefa");
-
-            if (response.IsSuccessStatusCode)
-            {
-                var tarefas = await response.Content.ReadFromJsonAsync<List<TarefaDTO>>();
-                return tarefas ?? new List<TarefaDTO>();
-            }
-
-            return new List<TarefaDTO>();
-        }
-
-        // Obter uma tarefa pelo ID
-        public async Task<TarefaDTO> GetTarefaByIdAsync(int id)
-        {
-            var response = await _httpClient.GetAsync($"api/tarefa/{id}");
-
-            if (response.IsSuccessStatusCode)
-            {
-                var tarefa = await response.Content.ReadFromJsonAsync<TarefaDTO>();
-                return tarefa;
-            }
-
-            return null;
-        }
-
-        // Criar uma nova tarefa
-        public async Task<TarefaDTO> CreateTarefaAsync(TarefaDTO tarefaDto)
-        {
-            var response = await _httpClient.PostAsJsonAsync("api/tarefa", tarefaDto);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var newTarefa = await response.Content.ReadFromJsonAsync<TarefaDTO>();
-                return newTarefa;
-            }
-
-            return null;
-        }
-
-        // Atualizar uma tarefa
-        public async Task<bool> UpdateTarefaAsync(int id, TarefaDTO tarefaDto)
-        {
-            var response = await _httpClient.PutAsJsonAsync($"api/tarefa/{id}", tarefaDto);
-
-            return response.IsSuccessStatusCode;
-        }
-
-        // Deletar uma tarefa
-        public async Task<bool> DeleteTarefaAsync(int id)
-        {
-            var response = await _httpClient.DeleteAsync($"api/tarefa/{id}");
-
-            return response.IsSuccessStatusCode;
-        }
+        var rsp = await PostAsync("api/tarefa/iniciar", dto);
+        return rsp.IsSuccessStatusCode
+            ? await rsp.Content.ReadFromJsonAsync<TarefaDto>()
+            : null;
     }
+
+    public async Task<TarefaDto?> EndAsync(int id, EndTarefaDto dto)
+    {
+        var rsp = await PostAsync($"api/tarefa/{id}/terminar", dto);
+        return rsp.IsSuccessStatusCode ? await rsp.Content.ReadFromJsonAsync<TarefaDto>() : null;
+    }
+
+    public Task<bool> MoveAsync(int tarefaId, int projetoDestinoId) =>
+        PutAsync($"api/tarefa/{tarefaId}/mover/{projetoDestinoId}", "").ContinueWith(t => t.Result.IsSuccessStatusCode);
+
+    public async Task<IEnumerable<TarefaDto>?> GetByProjetoIdAsync(int projetoId)
+    {
+        return await GetAsync<IEnumerable<TarefaDto>>($"api/tarefa/projeto/{projetoId}");
+    }
+
+    public async Task<IEnumerable<TarefaDto>?> ListByUserAsync(int userId)
+    {
+        return await GetAsync<IEnumerable<TarefaDto>>($"api/tarefa/utilizador/{userId}");
+    }
+    
+    public async Task<bool> DeleteAsync(int tarefaId)
+    {
+        var response = await base.DeleteAsync($"api/tarefa/{tarefaId}");
+        return response.IsSuccessStatusCode;
+    }
+
 }

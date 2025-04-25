@@ -1,36 +1,43 @@
-﻿using System.Net.Http;
+﻿using Blazored.LocalStorage;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
+using Frontend.DTOs.Utilizadores;              
+using System.Net.Http;
 
-namespace Frontend.Services
+namespace Frontend.Services;
+
+public sealed class AuthService : ApiService
 {
-    public class AuthService
+    private readonly ILocalStorageService _storage;
+
+    public AuthService(IHttpClientFactory factory,
+        ILocalStorageService storage) : base(factory)
+        => _storage = storage;
+
+    /// <summary>Autentica o utilizador e guarda o token no localStorage.</summary>
+    public async Task<bool> LoginAsync(LoginDto dto)
     {
-        private readonly HttpClient _httpClient;
+        HttpResponseMessage rsp = await PostAsync("api/utilizador/login", dto);
+        if (!rsp.IsSuccessStatusCode) return false;
 
-        public AuthService(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
+        var token = await rsp.Content.ReadFromJsonAsync<UtilizadorTokenDto>();
+        if (token is null) return false;
 
-        // Método para fazer login
-        public async Task<bool> LoginAsync(string username, string password)
-        {
-            var response = await _httpClient.PostAsJsonAsync("api/auth/login", new { Username = username, Password = password });
-            return response.IsSuccessStatusCode;
-        }
-
-        // Método para fazer logout
-        public void Logout()
-        {
-            // Limpar tokens ou informações de sessão
-        }
-
-        // Método para verificar se o usuário está autenticado
-        public bool IsAuthenticated()
-        {
-            // Aqui você pode verificar o token JWT ou qualquer outra forma de autenticação
-            return true; // Exemplo simples
-        }
+        await _storage.SetItemAsync("auth_token", token.Token);
+        await _storage.SetItemAsync<DateTime>("token_exp", token.Expiration);
+        return true;
     }
+
+    public async Task LogoutAsync()
+    {
+        await _storage.RemoveItemAsync("auth_token");
+        await _storage.RemoveItemAsync("token_exp");
+    }
+    
+    public async Task<int?> GetUserIdAsync() =>
+        await _storage.GetItemAsync<int?>("user_id");
+    
+    public async Task<DateTime?> GetTokenExpirationAsync() =>
+        await _storage.GetItemAsync<DateTime?>("token_exp");
+
+
 }

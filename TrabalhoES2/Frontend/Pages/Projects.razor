@@ -1,0 +1,80 @@
+﻿@page "/projects"
+@using System.IdentityModel.Tokens.Jwt
+@using Blazored.LocalStorage
+@using Frontend.DTOs.Projetos
+@using Frontend.Services
+@inject ProjetoService ProjetoService
+@inject ILocalStorageService LocalStorage
+@layout WorkspaceLayout
+
+<PageTitle>Projetos</PageTitle>
+
+<div class="page-container">
+    <div class="glass-side"></div>
+
+    <MudPaper Class="pa-6" Elevation="6" Style="flex: 2; width: 60%; background-color: white; border-radius: 16px;">
+        <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-4">Projetos</MudText>
+
+        <MudGrid GutterSize="3" RowSpacing="3">
+            @if (_projetos is null)
+            {
+                <MudText>Carregando projetos...</MudText>
+            }
+            else if (!_projetos.Any())
+            {
+                <MudText>Não existem projetos disponíveis.</MudText>
+            }
+            else
+            {
+                @foreach (var projeto in _projetos)
+                {
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudPaper Class="pa-4" Elevation="4" Style="backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.8); border-radius: 12px;">
+                            <MudText Typo="Typo.h6" Color="Color.Primary">@projeto.Nome</MudText>
+                            <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="mb-2">@projeto.NomeCliente</MudText>
+                            <MudDivider Class="mb-2"/>
+                            <MudText Typo="Typo.body2">@Shorten(projeto.Descricao)</MudText>
+                            <MudSpacer />
+                            <MudText Typo="Typo.caption" Class="mt-3"><b>Preço/h:</b> @projeto.PrecoHora?.ToString("C") ?? "N/D"</MudText>
+                            <MudText Typo="Typo.caption"><b>Criado em:</b> @projeto.DataCriacao?.ToShortDateString() ?? "N/D"</MudText>
+                        </MudPaper>
+                    </MudItem>
+                }
+            }
+        </MudGrid>
+    </MudPaper>
+
+    <div class="glass-side"></div>
+</div>
+
+@code {
+    private IEnumerable<ProjetoDto>? _projetos;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            if (string.IsNullOrEmpty(token))
+                return;
+
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
+            var idClaim = jwt.Claims.FirstOrDefault(c => c.Type == "nameid");
+
+            if (idClaim != null && int.TryParse(idClaim.Value, out var userId))
+            {
+                _projetos = await ProjetoService.ListByUserAsync(userId);
+            }
+        }
+        catch
+        {
+            // silencioso — sem logs ou mensagem
+        }
+    }
+
+    private string Shorten(string? text, int max = 100)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "Sem descrição.";
+        return text.Length <= max ? text : text.Substring(0, max) + "...";
+    }
+}

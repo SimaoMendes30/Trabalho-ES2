@@ -1,89 +1,76 @@
+﻿using Backend.DTOs.Utilizadores;
+using Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Backend.Models;
-using Backend.DTO_s;
-using AutoMapper;
+using Microsoft.Extensions.Logging;
 
-namespace Backend.Controllers
+namespace Backend.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public sealed class UtilizadorController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UtilizadorController : ControllerBase
+    private readonly IUtilizadorService _svc;
+    private readonly ILogger<UtilizadorController> _log;
+
+    public UtilizadorController(IUtilizadorService svc, ILogger<UtilizadorController> log)
     {
-        private readonly SgscContext _context;
-        private readonly IMapper _mapper;
-
-        public UtilizadorController(SgscContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
-        // POST: api/Utilizador (Criar conta)
-        [HttpPost]
-        public async Task<ActionResult<UtilizadorDTO>> PostUtilizador(UtilizadorDTO utilizadorDTO)
-        {
-            var existingUser = await _context.Utilizadors
-                .FirstOrDefaultAsync(u => u.Username == utilizadorDTO.Username);
-
-            if (existingUser != null)
-            {
-                return Conflict("Já existe um utilizador com este nome de utilizador.");
-            }
-
-            var utilizador = _mapper.Map<Utilizador>(utilizadorDTO);
-
-            _context.Utilizadors.Add(utilizador);
-            await _context.SaveChangesAsync();
-
-            var createdUtilizadorDTO = _mapper.Map<UtilizadorDTO>(utilizador);
-            return CreatedAtAction(nameof(GetUtilizador), new { id = utilizador.IdUtilizador }, createdUtilizadorDTO);
-        }
-
-        // GET: api/Utilizador/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UtilizadorDTO>> GetUtilizador(int id)
-        {
-            var utilizador = await _context.Utilizadors
-                .Include(u => u.Projetos)
-                .Include(u => u.Tarefas)
-                .FirstOrDefaultAsync(u => u.IdUtilizador == id);
-
-            if (utilizador == null)
-            {
-                return NotFound();
-            }
-
-            var utilizadorDTO = _mapper.Map<UtilizadorDTO>(utilizador);
-            return Ok(utilizadorDTO);
-        }
-       
-        [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarUtilizador(int id, [FromBody] UtilizadorUpdateDTO dadosAtualizados)
-        {
-            var utilizador = await _context.Utilizadors.FindAsync(id);
-            if (utilizador == null)
-                return NotFound();
-
-            if (utilizador.Username != dadosAtualizados.Username)
-            {
-                var usernameExistente = await _context.Utilizadors
-                    .AnyAsync(u => u.Username == dadosAtualizados.Username && u.IdUtilizador != id);
-
-                if (usernameExistente)
-                    return Conflict("Este nome de utilizador já está em uso.");
-            }
-
-            utilizador.Nome = dadosAtualizados.Nome;
-            utilizador.NumHoras = dadosAtualizados.NumHoras;
-            utilizador.Username = dadosAtualizados.Username;
-            utilizador.Password = dadosAtualizados.Password;
-
-            await _context.SaveChangesAsync();
-
-            return Ok("Dados do utilizador atualizados com sucesso.");
-        }
-
+        _svc = svc;
+        _log = log;
     }
-    
+
+    [HttpPost("login")]
+    public async Task<ActionResult<UtilizadorTokenDto>> Login([FromBody] UtilizadorLoginDto dto)
+    {
+        var token = await _svc.GerarTokenAsync(dto);
+        return Ok(token);
+    }
+
+    [HttpPost("criar")]
+    public async Task<ActionResult<UtilizadorDto>> Criar([FromBody] UtilizadorCreateDto dto)
+    {
+        var novo = await _svc.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = novo.IdUtilizador }, novo);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<UtilizadorDto>>> GetAll()
+    {
+        var list = await _svc.GetAllAsync();
+        return Ok(list);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<UtilizadorDto>> GetById(int id)
+    {
+        var user = await _svc.GetByIdAsync(id);
+        return Ok(user);
+    }
+
+    [HttpGet("{id:int}/details")]
+    public async Task<ActionResult<UtilizadorDetailsDto>> GetDetails(int id)
+    {
+        var details = await _svc.GetDetailsAsync(id);
+        return Ok(details);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UtilizadorUpdateDto dto)
+    {
+        await _svc.UpdateAsync(id, dto);
+        return NoContent();
+    }
+
+    [HttpPatch("{id:int}/password")]
+    public async Task<IActionResult> UpdatePassword(int id, [FromBody] UtilizadorUpdatePasswordDto dto)
+    {
+        await _svc.UpdatePasswordAsync(id, dto);
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _svc.DeleteAsync(id);
+        return NoContent();
+    }
 }

@@ -1,219 +1,45 @@
+﻿using Backend.DTOs.Projeto;
+using Backend.DTOs.Tarefas;
+using Backend.DTOs.Membros;
+using Backend.DTOs.Relatorios;
+using Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Backend.Models;
-using Backend.DTO_s;
-using AutoMapper;
 
-namespace Backend.Controllers
+namespace Backend.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class TarefaController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TarefaController : ControllerBase
-    {
-        private readonly SgscContext _context;
-        private readonly IMapper _mapper;
+    private readonly ITarefaService _service;
+    public TarefaController(ITarefaService service) => _service = service;
 
-        public TarefaController(SgscContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
+    [HttpPost("iniciar")]
+    public async Task<ActionResult<TarefaDto>> Iniciar([FromBody] StartTarefaDto dto) => Ok(await _service.StartAsync(dto));
 
-        // GET: api/Tarefa
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TarefaDTO>>> GetTarefas()
-        {
-            var tarefas = await _context.Tarefas.ToListAsync();
-            var tarefaDTOs = _mapper.Map<List<TarefaDTO>>(tarefas);
-            return Ok(tarefaDTOs);  // Retorna as tarefas mapeadas para DTO com status HTTP 200
-        }
+    [HttpPost("{id:int}/terminar")]
+    public async Task<ActionResult<TarefaDto>> Terminar(int id, [FromBody] EndTarefaDto dto) => Ok(await _service.EndAsync(id, dto));
 
-        // GET: api/Tarefa/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TarefaDTO>> GetTarefa(int id)
-        {
-            var tarefa = await _context.Tarefas.FindAsync(id);
+    [HttpPatch("{id:int}/mover/{destinoId:int}")]
+    public async Task<IActionResult> Mover(int id, int destinoId) { await _service.MoveAsync(id, destinoId); return NoContent(); }
 
-            if (tarefa == null)
-            {
-                return NotFound();  // Retorna 404 se a tarefa não for encontrada
-            }
+    [HttpGet("emcurso/{utilizadorId:int}")]
+    public async Task<IEnumerable<TarefaDto>> EmCurso(int utilizadorId) => await _service.ListarEmCursoAsync(utilizadorId);
 
-            var tarefaDTO = _mapper.Map<TarefaDTO>(tarefa);
-            return Ok(tarefaDTO);  // Retorna a tarefa mapeada para DTO com status HTTP 200
-        }
+    [HttpGet("concluidas/{utilizadorId:int}")]
+    public async Task<IEnumerable<TarefaDto>> Concluidas(int utilizadorId, DateTime inicio, DateTime fim) =>
+        await _service.ListarConcluidasAsync(utilizadorId, inicio, fim);
 
-        // POST: api/Tarefa
-        [HttpPost]
-        public async Task<ActionResult<TarefaDTO>> PostTarefa(TarefaDTO tarefaDTO)
-        {
-            var tarefa = _mapper.Map<Tarefa>(tarefaDTO);
-            _context.Tarefas.Add(tarefa);
-            await _context.SaveChangesAsync();
+    [HttpGet("relatorio/{utilizadorId:int}/{ano:int}/{mes:int}")]
+    public async Task<RelatorioMensalDto> Relatorio(int utilizadorId, int ano, int mes) =>
+        await _service.RelatorioMensalAsync(utilizadorId, ano, mes);
+    
+    [HttpGet("projeto/{projetoId:int}")]
+    public async Task<IEnumerable<TarefaDto>> PorProjeto(int projetoId) =>
+        await _service.GetByProjetoIdAsync(projetoId);
 
-            var tarefaRetornada = _mapper.Map<TarefaDTO>(tarefa);
-            return CreatedAtAction(nameof(GetTarefa), new { id = tarefa.IdTarefa }, tarefaRetornada);  // Retorna 201 com a nova tarefa criada mapeada para DTO
-        }
+    [HttpGet("utilizador/{utilizadorId:int}")]
+    public async Task<IEnumerable<TarefaDto>> PorUtilizador(int utilizadorId)
+        => await _service.GetByUtilizadorIdAsync(utilizadorId);
 
-        // PUT: api/Tarefa/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTarefa(int id, TarefaDTO tarefaDTO)
-        {
-            if (id != tarefaDTO.IdTarefa)
-            {
-                return BadRequest();  // Retorna 400 se o ID não coincidir
-            }
-
-            var tarefa = _mapper.Map<Tarefa>(tarefaDTO);
-            _context.Entry(tarefa).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TarefaExists(id))
-                {
-                    return NotFound();  // Retorna 404 se a tarefa não existir
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();  // Retorna 204 se a atualização for bem-sucedida
-        }
-
-        // DELETE: api/Tarefa/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTarefa(int id)
-        {
-            var tarefa = await _context.Tarefas.FindAsync(id);
-            if (tarefa == null)
-            {
-                return NotFound();  // Retorna 404 se a tarefa não for encontrada
-            }
-
-            _context.Tarefas.Remove(tarefa);
-            await _context.SaveChangesAsync();
-
-            return NoContent();  // Retorna 204 se a tarefa for removida com sucesso
-        }
-        
-        // DELETE: api/Tarefa/em-progresso/{id}
-        [HttpDelete("em-progresso/{id}")]
-        public async Task<IActionResult> RemoverTarefaEmProgresso(int id)
-        {
-            var tarefa = await _context.Tarefas.FindAsync(id);
-
-            if (tarefa == null)
-                return NotFound("Tarefa não encontrada.");
-
-            if (tarefa.Estado != "Em Progresso")
-                return BadRequest("Só é possível remover tarefas em progresso.");
-
-            _context.Tarefas.Remove(tarefa);
-            await _context.SaveChangesAsync();
-
-            return Ok(new
-            {
-                Mensagem = "Tarefa em progresso removida com sucesso.",
-                IdTarefaRemovida = id
-            });
-        }
-
-        // Verifica se a tarefa existe na base de dados
-        private bool TarefaExists(int id)
-        {
-            return _context.Tarefas.Any(e => e.IdTarefa == id);
-        }
-        [HttpPost("iniciar")]
-        public async Task<IActionResult> IniciarTarefa([FromBody] TarefaInicioDTO dto)
-        {
-            try
-            {
-                var utilizador = await _context.Utilizadors.FindAsync(dto.Responsavel);
-                if (utilizador == null)
-                    return NotFound("Utilizador não encontrado.");
-
-                var novaTarefa = new Tarefa
-                {
-                    Descricao = dto.Descricao,
-                    Estado = "Em Progresso",
-                    DataHoraInicio = DateTime.SpecifyKind(dto.DataHoraInicio, DateTimeKind.Utc),
-                    Responsavel = dto.Responsavel,
-                    DataInicio = DateOnly.FromDateTime(dto.DataHoraInicio)
-                };
-
-                _context.Tarefas.Add(novaTarefa);
-                await _context.SaveChangesAsync();
-
-                return Ok(new
-                {
-                    Mensagem = "Tarefa iniciada com sucesso.",
-                    TarefaId = novaTarefa.IdTarefa
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    Mensagem = "Erro interno ao salvar tarefa.",
-                    Erro = ex.InnerException?.Message ?? ex.Message
-                });
-            }
-        }
-
-
-        [HttpPost("{idTarefa}/definir-preco-hora")]
-        public async Task<IActionResult> DefinirPrecoHoraTarefa(int idTarefa, [FromQuery] int idProjeto)
-        {
-            var tarefa = await _context.Tarefas.FindAsync(idTarefa);
-            if (tarefa == null)
-                return NotFound("Tarefa não encontrada.");
-
-            var projeto = await _context.Projetos.FindAsync(idProjeto);
-            if (projeto == null)
-                return NotFound("Projeto não encontrado.");
-
-            if (projeto.PrecoHora == null)
-                return BadRequest("O projeto não tem um preço hora definido.");
-
-            tarefa.PrecoHora = projeto.PrecoHora;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-                return Ok(new
-                {
-                    Mensagem = $"Preço hora da tarefa atualizado para {tarefa.PrecoHora}€ com base no projeto '{projeto.Nome}'"
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    Erro = "Erro interno ao atualizar preço hora da tarefa.",
-                    Detalhes = ex.InnerException?.Message ?? ex.Message
-                });
-            }
-        }
-        
-        [HttpGet("em-progresso/{idUtilizador}")]
-        public async Task<ActionResult<IEnumerable<TarefaDTO>>> GetTarefasEmProgressoPorUtilizador(int idUtilizador)
-        {
-            var tarefas = await _context.Tarefas
-                .Where(t => t.Responsavel == idUtilizador && t.Estado == "Em Progresso")
-                .ToListAsync();
-
-            var tarefaDTOs = _mapper.Map<List<TarefaDTO>>(tarefas);
-            return Ok(tarefaDTOs);
-        }
-
-        
-        }
-
-
-    }
+}

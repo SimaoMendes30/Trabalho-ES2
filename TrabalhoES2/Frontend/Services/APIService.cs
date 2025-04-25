@@ -1,41 +1,25 @@
-﻿using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
+﻿using System.Net.Http.Json;
+using Frontend.DTOs;
 
-namespace Frontend.Services
+namespace Frontend.Services;
+
+public class ApiService
 {
-    public class ApiService
+    protected readonly HttpClient _http;
+
+    public ApiService(IHttpClientFactory factory) => _http = factory.CreateClient("Backend");
+
+    protected async Task<T?> GetAsync<T>(string url) =>
+        await _http.GetFromJsonAsync<T>(url);
+
+    protected async Task<HttpResponseMessage> PostAsync<T>(string url, T payload) =>
+        await _http.PostAsJsonAsync(url, payload);
+
+    protected Task<HttpResponseMessage> PutAsync<T>(string url, T payload) =>
+        _http.PutAsJsonAsync(url, payload);
+
+    public async Task<HttpResponseMessage> DeleteAsync(string url)
     {
-        private readonly HttpClient _httpClient;
-
-        public ApiService(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-
-        public async Task<T> GetAsync<T>(string url)
-        {
-            var response = await _httpClient.GetFromJsonAsync<T>(url);
-            return response;
-        }
-
-        public async Task<T> PostAsync<T>(string url, T data)
-        {
-            var response = await _httpClient.PostAsJsonAsync(url, data);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<T>();
-        }
-
-        public async Task PutAsync<T>(string url, T data)
-        {
-            var response = await _httpClient.PutAsJsonAsync(url, data);
-            response.EnsureSuccessStatusCode();
-        }
-
-        public async Task DeleteAsync(string url)
-        {
-            var response = await _httpClient.DeleteAsync(url);
-            response.EnsureSuccessStatusCode();
-        }
+        return await _http.DeleteAsync(url);
     }
 }

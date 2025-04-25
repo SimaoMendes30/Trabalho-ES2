@@ -1,46 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Frontend.DTO_s;
+﻿using Frontend.DTOs.Membros;
+using System.Net.Http.Json;
 
-namespace Frontend.Services
+namespace Frontend.Services;
+
+public class MembroService : ApiService
 {
-    public class MembroService
-    {
-        private readonly ApiService _apiService;
+    public MembroService(IHttpClientFactory f) : base(f) { }
 
-        public MembroService(ApiService apiService)
-        {
-            _apiService = apiService;
-        }
+    public Task<IEnumerable<MembroDto>?> PorProjetoAsync(int projetoId) =>
+        GetAsync<IEnumerable<MembroDto>>($"api/membro/projeto/{projetoId}");
 
-        // Obter todos os membros
-        public async Task<List<MembroDTO>> GetMembrosAsync()
-        {
-            return await _apiService.GetAsync<List<MembroDTO>>("api/membro");
-        }
+    public async Task<bool> AddAsync(CreateMembroDto dto) =>
+        (await PostAsync("api/membro", dto)).IsSuccessStatusCode;
 
-        // Obter um membro específico pelo ID
-        public async Task<MembroDTO> GetMembroByIdAsync(int id)
-        {
-            return await _apiService.GetAsync<MembroDTO>($"api/membro/{id}");
-        }
-
-        // Criar um novo membro
-        public async Task<MembroDTO> CreateMembroAsync(MembroDTO membroDTO)
-        {
-            return await _apiService.PostAsync("api/membro", membroDTO);
-        }
-
-        // Atualizar um membro
-        public async Task UpdateMembroAsync(int id, MembroDTO membroDTO)
-        {
-            await _apiService.PutAsync($"api/membro/{id}", membroDTO);
-        }
-
-        // Deletar um membro
-        public async Task DeleteMembroAsync(int id)
-        {
-            await _apiService.DeleteAsync($"api/membro/{id}");
-        }
-    }
+    public Task<bool> DeleteAsync(int id) =>
+        DeleteAsync($"api/membro/{id}").ContinueWith(t => t.Result.IsSuccessStatusCode);
 }
