@@ -1,0 +1,177 @@
+﻿@page "/project/{ProjetoId:int}"
+@using Blazored.LocalStorage
+@using Frontend.DTOs.Project
+@using Frontend.DTOs.Task
+@using Frontend.DTOs.User
+@using Frontend.Services
+
+@inject ILocalStorageService LocalStorage
+@inject ProjectService ProjectService
+@inject TaskService TaskService
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@layout WorkspaceLayout
+
+<PageTitle>Project Details</PageTitle>
+
+<div class="page-container">
+    <div class="glass-side"></div>
+
+    <div style="flex:2;padding:2rem">
+        @if (_project is null)
+        {
+            <MudProgressCircular Color="Color.Primary" Indeterminate Size="Size.Large" />
+        }
+        else
+        {
+            <!-- ========== INFORMAÇÕES DO PROJETO ========== -->
+            <MudPaper Elevation="3" Class="pa-6 mb-6"
+                      Style="background:rgba(255,255,255,.95);border-radius:16px;position:relative;">
+                
+                <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="DeleteProject"
+                           Style="position:absolute;top:16px;right:16px;">
+                    Eliminar
+                </MudButton>
+
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h4" Color="Color.Primary">@_project.Nome</MudText>
+                    <MudText Typo="Typo.subtitle2">@_project.NomeCliente</MudText>
+
+                    <MudDivider Class="my-2" Style="border-color: var(--app-primary);" />
+                    
+                    <MudText Typo="Typo.body1">@_project.Descricao</MudText>
+                    
+                    <MudStack Row Spacing="4" Class="mt-2">
+                        <MudText Typo="Typo.caption"><b>Responsável:</b> @(_user?.Nome ?? "N/D")</MudText>
+                        <MudText Typo="Typo.caption"><b>Preço/h:</b> @(_project.PrecoHora.HasValue ? _project.PrecoHora.Value.ToString("C") : "N/D")</MudText>
+                        <MudText Typo="Typo.caption">
+                            <b>Criado em:</b> 
+                            @(_project.DataCriacao.HasValue ? _project.DataCriacao.Value.UtcDateTime.ToString("dd/MM/yyyy") : "N/D")
+                        </MudText>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+
+            <!-- ========== MEMBROS ASSOCIADOS ========== -->
+            <MudPaper Elevation="3" Class="pa-6 mb-6"
+                      Style="background:rgba(255,255,255,.95);border-radius:16px">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6" Color="Color.Primary">Membros Associados</MudText>
+
+                    @if (_project.Membros is null || !_project.Membros.Any())
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Filled">
+                            Não existem membros associados a este projeto.
+                        </MudAlert>
+                    }
+                    else
+                    {
+                        <MudTable Items="_project.Membros">
+                            <HeaderContent>
+                                <MudTh>ID Membro</MudTh>
+                                <MudTh>ID Utilizador</MudTh>
+                                <MudTh>Estado Convite</MudTh>
+                                <MudTh>Estado Atividade</MudTh>
+                                <MudTh>Data Convite</MudTh>
+                                <MudTh>Data Estado</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@context.IdMembro</MudTd>
+                                <MudTd>@context.IdUtilizador</MudTd>
+                                <MudTd>@context.EstadoConvite</MudTd>
+                                <MudTd>@(string.IsNullOrEmpty(context.EstadoAtividade) ? "N/D" : context.EstadoAtividade)</MudTd>
+                                <MudTd>@context.DataConvite.UtcDateTime.ToString("dd/MM/yyyy")</MudTd>
+                                <MudTd>@(context.DataEstado.HasValue ? context.DataEstado.Value.UtcDateTime.ToString("dd/MM/yyyy") : "N/D")</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
+                </MudStack>
+            </MudPaper>
+
+            <!-- ========== TAREFAS ASSOCIADAS ========== -->
+            <MudPaper Elevation="3" Class="pa-6"
+                      Style="background:rgba(255,255,255,.95);border-radius:16px">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6" Color="Color.Primary">Tarefas Associadas</MudText>
+
+                    @if (_tasks is null)
+                    {
+                        <MudProgressCircular Color="Color.Primary" Indeterminate />
+                    }
+                    else if (!_tasks.Any())
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Filled">
+                            Não existem tarefas associadas.
+                        </MudAlert>
+                    }
+                    else
+                    {
+                        <MudGrid GutterSize="2" RowSpacing="3">
+                            @foreach (var t in _tasks)
+                            {
+                                <MudItem xs="12" sm="6" md="4">
+                                    <TaskCard Task="t" OnTaskCompleted="CompleteTask" OnTaskRemoved="RemoveTask" />
+                                </MudItem>
+                            }
+                        </MudGrid>
+                    }
+                </MudStack>
+            </MudPaper>
+        }
+    </div>
+
+    <div class="glass-side"></div>
+</div>
+
+@code {
+    [Parameter] public int ProjetoId { get; set; }
+
+    private ProjectDetailsExtendedDto? _project;
+    private UserDetailsExtendedDto? _user;
+    private IEnumerable<TaskDetailsDto>? _tasks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await LocalStorage.GetItemAsync<int?>("user_id");
+        if (!userId.HasValue)
+        {
+            Snackbar.Add("Utilizador não autenticado.", Severity.Warning);
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        _user = await UserService.GetByIdAsync(userId.Value);
+
+        var projectTask = ProjectService.GetByIdAsync(ProjetoId);
+        var tasksTask = TaskService.GetByProjetoIdAsync(ProjetoId);
+
+        await Task.WhenAll(projectTask, tasksTask);
+
+        _project = projectTask.Result;
+        _tasks = tasksTask.Result;
+    }
+
+    private async Task DeleteProject()
+    {
+        var confirm = await DialogService.ShowMessageBox(
+            "Remover Projeto",
+            "Tem a certeza que deseja marcar este projeto como removido?",
+            "Sim", "Cancelar");
+
+        if (confirm == true && _project is not null)
+        {
+            try
+            {
+                await ProjectService.DeleteAsync(_project.IdProjeto);
+                Snackbar.Add("Projeto marcado como removido com sucesso.", Severity.Success);
+                NavigationManager.NavigateTo("/projects");
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Erro ao remover o projeto: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+}

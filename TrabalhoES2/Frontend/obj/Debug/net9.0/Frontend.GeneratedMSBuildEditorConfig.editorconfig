@@ -31,20 +31,16 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Projetos/CreateProjectDialog.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQcm9qZXRvc1xDcmVhdGVQcm9qZWN0RGlhbG9nLnJhem9y
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Projects/CreateProjectDialog.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQcm9qZWN0c1xDcmVhdGVQcm9qZWN0RGlhbG9nLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Projetos/EditProjetoInline.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQcm9qZXRvc1xFZGl0UHJvamV0b0lubGluZS5yYXpvcg==
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Tasks/CreateTaskDialog.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xUYXNrc1xDcmVhdGVUYXNrRGlhbG9nLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Projetos/MoverTarefaInline.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQcm9qZXRvc1xNb3ZlclRhcmVmYUlubGluZS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Projetos/NovaTarefaInline.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQcm9qZXRvc1xOb3ZhVGFyZWZhSW5saW5lLnJhem9y
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Tasks/TaskCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xUYXNrc1xUYXNrQ2FyZC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Test.razor]
@@ -55,8 +51,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3JlYXRlQWNjb3VudC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Dashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/InviteMember.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52aXRlTWVtYmVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Login.razor]
@@ -67,20 +71,28 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm90Rm91bmRQYWdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/ProjectDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvamVjdERldGFpbHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/ProjectEdit.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvamVjdEVkaXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Projects.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvamVjdHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/ProjetoDetalhes.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvamV0b0RldGFsaGVzLnJhem9y
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/TaskDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGFza0RldGFpbHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Test.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVzdC5yYXpvcg==
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Tasks.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGFza3MucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Workspace.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV29ya3NwYWNlLnJhem9y
+[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/UpdateProfile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXBkYXRlUHJvZmlsZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/User/Desktop/ESII_SGSC/Frontend/_Imports.razor]
