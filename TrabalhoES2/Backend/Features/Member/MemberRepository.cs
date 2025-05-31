@@ -108,4 +108,81 @@ public sealed class MemberRepository : IMemberRepository
             throw new ValidationException("EstadoAtividade inválido. Deve ser: Ativo ou Inativo.");
         }
     }
+    
+    public async System.Threading.Tasks.Task RemoveFromProjectAsync(int projectId, int userId)
+    {
+        await using var ctx = _factory.CreateDbContext();
+
+        var member = await ctx.Membro
+            .FirstOrDefaultAsync(m => m.IdProjeto == projectId && m.IdUtilizador == userId);
+
+        if (member != null)
+        {
+            member.EstadoAtividade = "Inativo";
+            member.EstadoConvite = "Recusado";
+            member.DataEstado = DateTimeOffset.UtcNow;
+
+            ctx.Membro.Update(member);
+            await ctx.SaveChangesAsync();
+        }
+
+        // Remover o membro de todas as tarefas do projeto
+        var tasks = await ctx.Tarefa
+            .Where(t => t.IdProjetos.Any(p => p.IdProjeto == projectId))
+            .Include(t => t.IdUtilizadors)
+            .ToListAsync();
+
+        foreach (var task in tasks)
+        {
+            var userToRemove = task.IdUtilizadors.FirstOrDefault(u => u.IdUtilizador == userId);
+            if (userToRemove != null)
+            {
+                task.IdUtilizadors.Remove(userToRemove);
+            }
+        }
+
+        await ctx.SaveChangesAsync();
+    }
+
+
+
+    public async System.Threading.Tasks.Task RemoveFromTaskAsync(int taskId, int userId)
+    {
+        await using var ctx = _factory.CreateDbContext();
+    
+        var task = await ctx.Tarefa
+            .Include(t => t.IdUtilizadors)
+            .FirstOrDefaultAsync(t => t.IdTarefa == taskId);
+
+        if (task != null)
+        {
+            var user = task.IdUtilizadors.FirstOrDefault(u => u.IdUtilizador == userId);
+
+            if (user != null)
+            {
+                // Remover o utilizador da coleção
+                task.IdUtilizadors.Remove(user);
+
+                // Atualizar a coleção no Entity Framework
+                ctx.Entry(task).State = EntityState.Modified;
+                await ctx.SaveChangesAsync();
+            }
+        }
+    }
+    
+    public async Task<bool> ExistsAsync(int projectId, int userId)
+    {
+        await using var ctx = _factory.CreateDbContext();
+        return await ctx.Membro.AnyAsync(m => m.IdProjeto == projectId && m.IdUtilizador == userId);
+    }
+    
+    public async Task<IEnumerable<MemberEntity>> GetPendingInvitationsAsync(int userId)
+    {
+        await using var ctx = _factory.CreateDbContext();
+        return await ctx.Membro
+            .Include(m => m.IdUserEntityNavigation)
+            .Include(m => m.IdProjectEntityNavigation)
+            .Where(m => m.IdUtilizador == userId && m.EstadoConvite == "Pendente")
+            .ToListAsync();
+    }
 }

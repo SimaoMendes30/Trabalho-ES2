@@ -80,8 +80,10 @@ public sealed class ProjectService : IProjectService
         
         var membros = await _repoMember.FilteredListAsync(new MemberFilterDto
         {
-            IdUtilizador = userId
+            IdUtilizador = userId,
+            EstadoConvite = "Aceite"
         });
+
 
         var idsProjetosMembro = membros.Select(m => m.IdProjeto).Distinct().ToList();
 

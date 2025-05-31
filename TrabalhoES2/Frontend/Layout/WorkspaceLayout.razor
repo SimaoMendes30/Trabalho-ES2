@@ -16,7 +16,22 @@
         <MudDrawer @bind-Open="_drawerOpen"
                    ClipMode="DrawerClipMode.Never"
                    Variant="DrawerVariant.Temporary">
-            <!-- navegação lateral -->
+            <MudNavMenu>
+                <MudNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Dashboard" Match="NavLinkMatch.All">
+                    Dashboard
+                </MudNavLink>
+                <MudNavLink Href="/projects" Icon="@Icons.Material.Filled.Folder">
+                    Projetos
+                </MudNavLink>
+                <MudNavLink Href="/tasks" Icon="@Icons.Material.Filled.Checklist">
+                    Tarefas
+                </MudNavLink>
+
+                <!-- 🚀 Novo botão para Pedidos Pendentes -->
+                <MudNavLink Href="/pending-invitations" Icon="@Icons.Material.Filled.MailOutline">
+                    Pedidos Pendentes
+                </MudNavLink>
+            </MudNavMenu>
         </MudDrawer>
 
         <MudMainContent>

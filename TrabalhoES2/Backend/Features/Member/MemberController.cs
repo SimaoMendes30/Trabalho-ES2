@@ -57,4 +57,77 @@ public class MemberController : ControllerBase
         await _service.DeleteAsync(id);
         return NoContent();
     }
+
+    // ➡️ Enviar convite para Tarefa
+    // POST /api/membros/tarefa/{taskId}
+    [HttpPost("tarefa/{taskId}")]
+    public async Task<ActionResult<MemberDetailsDto>> InviteToTask(
+        int taskId, MemberCreateDto dto, [FromQuery] int projectId)
+    {
+        var result = await _service.InviteToTaskAsync(dto.IdUtilizador, taskId, projectId);
+        return CreatedAtAction(nameof(GetById), new { id = result.IdMembro }, result);
+    }
+
+
+    // ➡️ Responder a convite para Tarefa
+    [HttpPut("tarefa/{id}")]
+    public async Task<IActionResult> RespondToTaskInvitation(int id, [FromQuery] bool accept)
+    {
+        await _service.RespondToTaskInvitationAsync(id, accept);
+        return NoContent();
+    }
+    
+    [HttpPut("projeto/{id}")]
+    public async Task<IActionResult> RespondToProjectInvitation(int id, [FromQuery] bool accept)
+    {
+        await _service.RespondToProjectInvitationAsync(id, accept);
+        return NoContent();
+    }
+    [HttpDelete("projeto/{id}/utilizador/{userId}")]
+    public async Task<IActionResult> RemoveMemberFromProject(int id, int userId, [FromQuery] int currentUserId)
+    {
+        try
+        {
+            await _service.RemoveMemberFromProjectAsync(currentUserId, id, userId);
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message); // ou: return StatusCode(403, ex.Message);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro interno: {ex.Message}");
+        }
+    }
+
+
+    [HttpDelete("tarefa/{id}/utilizador/{userId}")]
+    public async Task<IActionResult> RemoveMemberFromTask(int id, int userId)
+    {
+        await _service.RemoveMemberFromTaskAsync(id, userId);
+        return NoContent();
+    }
+    
+    [HttpPost("projeto")]
+    public async Task<ActionResult<MemberDetailsDto>> InviteToProject(
+        [FromQuery] int currentUserId,
+        [FromQuery] int userId,
+        [FromQuery] int projectId)
+    {
+        var result = await _service.InviteToProjectAsync(currentUserId, userId, projectId);
+        return CreatedAtAction(nameof(GetById), new { id = result.IdMembro }, result);
+    }
+
+    
+    [HttpGet("pending/{userId}")]
+    public async Task<ActionResult<IEnumerable<MemberDetailsDto>>> GetPendingInvitations(int userId)
+    {
+        var invites = await _service.GetPendingInvitationsAsync(userId);
+        return Ok(invites);
+    }
 }

@@ -22,5 +22,8 @@ namespace Frontend.DTOs.Member
         
         [DataType(DataType.DateTime)]
         public DateTimeOffset? DataEstado { get; set; }
+        
+        [Required]
+        public int IdTarefa { get; set; }
     }
 }

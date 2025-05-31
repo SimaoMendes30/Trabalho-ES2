@@ -81,7 +81,8 @@ public class TaskService : ApiService
             ["page"] = page.ToString(),
             ["pageSize"] = pageSize.ToString(),
             ["orderBy"] = orderBy,
-            ["descending"] = descending.ToString().ToLower()
+            ["descending"] = descending.ToString().ToLower(),
+            ["IdsResponsaveis"] = userId.ToString() // Aqui está o ajuste
         };
 
         if (filtros != null)
@@ -103,7 +104,7 @@ public class TaskService : ApiService
                 .Where(kv => !string.IsNullOrWhiteSpace(kv.Value))
                 .Select(kv => $"{Uri.EscapeDataString(kv.Key)}={Uri.EscapeDataString(kv.Value!)}"));
 
-        var url = $"api/tarefas/utilizador/{userId}/paged?{queryString}";
+        var url = $"api/tarefas/paged?{queryString}";
 
         var result = await GetAsync<PagedResult<TaskDetailsDto>>(url);
         return result ?? throw new Exception("Erro ao obter tarefas do utilizador.");
@@ -113,5 +114,32 @@ public class TaskService : ApiService
     {
         var result = await GetAsync<IEnumerable<TaskDetailsDto>>($"api/tarefas/projeto/{projetoId}");
         return result ?? throw new Exception("Erro ao obter tarefas do projeto.");
+    }
+    
+    public async Task AssociateTaskToProject(int taskId, int projectId)
+    {
+        // Passar um objeto vazio para gerar um body vazio "{}"
+        var response = await PostAsync<object>($"api/tarefas/{taskId}/associate/{projectId}", new { });
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            throw new ApplicationException($"Erro ao associar tarefa ao projeto: {errorMessage}");
+        }
+    }
+    public async Task DisassociateTaskFromProject(int taskId, int projectId)
+    {
+        var response = await DeleteRequestAsync($"api/tarefas/{taskId}/disassociate/{projectId}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            throw new ApplicationException($"Erro ao desassociar tarefa do projeto: {errorMessage}");
+        }
+    }
+    public async Task<IEnumerable<TaskDetailsExtendedDto>> GetExtendedByProjetoIdAsync(int projetoId)
+    {
+        var result = await GetAsync<IEnumerable<TaskDetailsExtendedDto>>($"api/tarefas/projeto/{projetoId}/extended");
+        return result ?? new List<TaskDetailsExtendedDto>();
     }
 }

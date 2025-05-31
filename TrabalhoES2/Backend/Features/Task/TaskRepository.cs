@@ -24,9 +24,11 @@ public sealed class TaskRepository : ITaskRepository
         await using var ctx = _factory.CreateDbContext();
         return await ctx.Tarefa
             .Include(t => t.ResponsavelNavigation)
+            .Include(t => t.IdProjetos) // <-- Adicionado Include para carregar os projetos relacionados
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.IdTarefa == id);
     }
+
 
     public async Task<IEnumerable<TaskEntity>> FilteredListAsync(TaskFilterDto filter)
     {

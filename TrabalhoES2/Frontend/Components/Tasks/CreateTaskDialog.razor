@@ -33,6 +33,12 @@
                                @bind-Date="DataInicio"
                                Required="true" />
 
+                <!-- Data de Fim -->
+                <MudDatePicker Label="Data de Fim"
+                               @bind-Date="DataFim"
+                               Required="true"
+                               HelperText="Escolha uma data de conclusão" />
+
                 <!-- Preço por hora -->
                 <MudNumericField T="decimal?"
                                  Label="Preço/Hora (€)"
@@ -58,6 +64,7 @@
 
     // Variáveis auxiliares para sincronizar com o MudDatePicker
     private DateTime? DataInicio { get; set; }
+    private DateTime? DataFim { get; set; }
     
     // DTO da Tarefa
     private TaskCreateDto Tarefa { get; set; } = new();
@@ -83,8 +90,9 @@
             NavigationManager.NavigateTo("/login");
         }
 
-        // ✅ Definir valores iniciais
+        // ✅ Definir data de início para hoje
         DataInicio = DateTime.Now;
+        // Não pré-definir DataFim para forçar escolha manual
 
         // ✅ Estado por defeito como "Em curso"
         Tarefa.Estado = "Em curso";
@@ -94,17 +102,30 @@
     {
         if (_editContext.Validate())
         {
-            // ✅ Converter para DateTimeOffset em UTC
+            // Converter para DateTimeOffset em UTC
             Tarefa.DataInicio = DataInicio.HasValue 
                 ? new DateTimeOffset(DataInicio.Value.ToUniversalTime(), TimeSpan.Zero) 
                 : DateTimeOffset.UtcNow;
+            
+            // Validar DataFim
+            if (!DataFim.HasValue)
+            {
+                Snackbar.Add("A data de fim é obrigatória.", Severity.Error);
+                return;
+            }
+            if (DataFim < DataInicio)
+            {
+                Snackbar.Add("A data de fim deve ser posterior à data de início.", Severity.Error);
+                return;
+            }
+            Tarefa.DataFim = new DateTimeOffset(DataFim.Value.ToUniversalTime(), TimeSpan.Zero);
 
             _submitting = true;
             try
             {
                 var result = await TaskService.CreateAsync(Tarefa);
                 Snackbar.Add("Tarefa criada com sucesso!", Severity.Success);
-                MudDialog.Close(DialogResult.Ok(result)); // 🔄 MudDialog.Close com o valor de retorno
+                MudDialog.Close(DialogResult.Ok(result));
             }
             catch (Exception ex)
             {
@@ -119,6 +140,6 @@
 
     private void Cancel()
     {
-        MudDialog.Cancel(); // 🔄 MudDialog.Cancel para fechar corretamente
+        MudDialog.Cancel();
     }
 }

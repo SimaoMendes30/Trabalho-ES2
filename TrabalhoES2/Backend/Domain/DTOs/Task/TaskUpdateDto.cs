@@ -22,5 +22,8 @@ namespace Backend.Domain.DTOs.Task
 
         [Range(0, 9999999999.99)]
         public decimal? PrecoHora { get; set; }
+
+        // Adicionar o ID do Projeto
+        public int? ProjetoId { get; set; } // <- AQUI
     }
 }

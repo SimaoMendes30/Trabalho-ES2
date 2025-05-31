@@ -1,0 +1,125 @@
+﻿@page "/pending-invitations"
+@using Blazored.LocalStorage
+@using Frontend.DTOs.Member
+@using Frontend.Services
+@inject MemberService MemberService
+@inject ProjectService ProjectService
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@layout WorkspaceLayout
+
+<PageTitle>Pedidos Pendentes</PageTitle>
+
+<div class="page-container">
+    <div class="glass-side"></div>
+
+    <div style="flex: 2; padding: 2rem;">
+        <MudPaper Elevation="3" Class="pa-6 mb-6"
+                  Style="background: rgba(255,255,255,.95); border-radius: 16px;">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h5" Color="Color.Primary">Pedidos Pendentes</MudText>
+
+                @if (pendingInvitations is null)
+                {
+                    <MudProgressCircular Color="Color.Primary" Indeterminate />
+                }
+                else if (!pendingInvitations.Any())
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">
+                        Não existem pedidos pendentes.
+                    </MudAlert>
+                }
+                else
+                {
+                    <MudTable Items="pendingInvitations" Elevation="1" Class="mt-4">
+                        <HeaderContent>
+                            <MudTh>Projeto</MudTh>
+                            <MudTh>Data Convite</MudTh>
+                            <MudTh>Ações</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>
+                                <!-- Verifica se o projeto está no dicionário e mostra o nome -->
+                                @projectNames.ContainsKey(context.IdProjeto) ? 
+                                    projectNames[context.IdProjeto] : "Projeto Desconhecido"
+                            </MudTd>
+                            <MudTd>
+                                <MudText Typo="Typo.body1">@context.DataConvite.ToString("dd/MM/yyyy")</MudText>
+                            </MudTd>
+                            <MudTd>
+                                <MudStack Row Spacing="1">
+                                    <MudButton Color="Color.Success" Variant="Variant.Filled"
+                                               OnClick="() => RespondToInvite(context.IdMembro, true)">
+                                        <MudIcon Icon="@Icons.Material.Filled.Check" /> Aceitar
+                                    </MudButton>
+                                    <MudButton Color="Color.Error" Variant="Variant.Outlined"
+                                               OnClick="() => RespondToInvite(context.IdMembro, false)">
+                                        <MudIcon Icon="@Icons.Material.Filled.Close" /> Recusar
+                                    </MudButton>
+                                </MudStack>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudStack>
+        </MudPaper>
+    </div>
+
+    <div class="glass-side"></div>
+</div>
+
+@code {
+    private List<MemberDetailsDto> pendingInvitations = new();
+    private Dictionary<int, string> projectNames = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await LocalStorage.GetItemAsync<int?>("user_id");
+        if (userId.HasValue)
+        {
+            pendingInvitations = (await MemberService.GetPendingInvitationsAsync(userId.Value)).ToList();
+            
+            // 🔹 Carregar os nomes dos projetos
+            foreach (var invite in pendingInvitations)
+            {
+                if (!projectNames.ContainsKey(invite.IdProjeto))
+                {
+                    var project = await ProjectService.GetByIdAsync(invite.IdProjeto);
+                    if (project != null)
+                    {
+                        projectNames[invite.IdProjeto] = project.Nome;
+                    }
+                    else
+                    {
+                        projectNames[invite.IdProjeto] = "Projeto Desconhecido";
+                    }
+                }
+            }
+        }
+        else
+        {
+            Snackbar.Add("Utilizador não autenticado.", Severity.Error);
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+
+    private async Task RespondToInvite(int memberId, bool accept)
+    {
+        try
+        {
+            await MemberService.RespondToProjectInvitationAsync(memberId, accept);
+            Snackbar.Add(accept ? "Convite aceite. Projeto adicionado à sua lista!" : "Convite recusado.", accept ? Severity.Success : Severity.Warning);
+
+            pendingInvitations.RemoveAll(m => m.IdMembro == memberId);
+            StateHasChanged();
+
+            // Forçar atualização da página de projetos para refletir
+            NavigationManager.NavigateTo("/projects", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao responder ao convite: {ex.Message}", Severity.Error);
+        }
+    }
+}

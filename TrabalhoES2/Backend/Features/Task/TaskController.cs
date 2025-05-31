@@ -23,13 +23,6 @@ public class TaskController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<TaskDetailsDto>>> GetAll([FromQuery] TaskFilterDto filter)
-    {
-        var result = await _service.FilteredListAsync(filter);
-        return Ok(result);
-    }
-
     [HttpGet("{id}")]
     public async Task<ActionResult<TaskDetailsExtendedDto>> GetById(int id)
     {
@@ -58,46 +51,32 @@ public class TaskController : ControllerBase
         return NoContent();
     }
     
-    [HttpGet("utilizador/{userId}/paged")]
-    public async Task<ActionResult<PagedResult<TaskDetailsDto>>> GetByUserPaged(
-        int userId,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 15,
-        [FromQuery] string? orderBy = null,
-        [FromQuery] bool descending = false,
-        [FromQuery] string? titulo = null,
-        [FromQuery] int? responsavel = null,
-        [FromQuery] DateTime? dataInicioDe = null,
-        [FromQuery] DateTime? dataInicioAte = null,
-        [FromQuery] DateTime? dataFimDe = null,
-        [FromQuery] DateTime? dataFimAte = null,
-        [FromQuery] string? estado = null,
-        [FromQuery] decimal? precoHoraMin = null,
-        [FromQuery] decimal? precoHoraMax = null,
-        [FromQuery] bool? isDeleted = null)
+    // 🔹 POST: /api/tarefas/{taskId}/associate/{projectId}
+    [HttpPost("{taskId}/associate/{projectId}")]
+    public async Task<IActionResult> AssociateToProject(int taskId, int projectId)
     {
-        var filters = new TaskFilterDto
-        {
-            Titulo = titulo,
-            Responsavel = responsavel,
-            DataInicioDe = dataInicioDe,
-            DataInicioAte = dataInicioAte,
-            DataFimDe = dataFimDe,
-            DataFimAte = dataFimAte,
-            Estado = estado,
-            PrecoHoraMin = precoHoraMin,
-            PrecoHoraMax = precoHoraMax,
-            IsDeleted = isDeleted
-        };
-
-        var result = await _service.GetByUserPagedAsync(userId, page, pageSize, orderBy, descending, filters);
-        return Ok(result);
+        await _service.AssociateTaskToProjectAsync(taskId, projectId);
+        return Ok(new { Message = $"Tarefa {taskId} associada ao Projeto {projectId} com sucesso!" });
     }
     
     [HttpGet("projeto/{projetoId}")]
     public async Task<ActionResult<IEnumerable<TaskDetailsDto>>> GetByProjetoId(int projetoId)
     {
-        var result = await _service.GetByProjetoIdAsync(projetoId);
-        return Ok(result);
+        var tarefas = await _service.GetByProjetoIdAsync(projetoId);
+        return Ok(tarefas);
+    }
+    
+    [HttpPut("{id}/concluir")]
+    public async Task<IActionResult> Concluir(int id, [FromQuery] int userId)
+    {
+        await _service.ConcluirTarefaAsync(id, userId);
+        return NoContent();
+    }
+    
+    [HttpDelete("{taskId}/disassociate/{projectId}")]
+    public async Task<IActionResult> DisassociateFromProject(int taskId, int projectId)
+    {
+        await _service.DisassociateTaskFromProjectAsync(taskId, projectId);
+        return Ok(new { Message = $"Tarefa {taskId} desassociada do Projeto {projectId} com sucesso!" });
     }
 }

@@ -14,16 +14,33 @@ namespace Backend.Dtos
             // Member
             CreateMap<MemberEntity, MemberCreateDto>().ReverseMap();
             CreateMap<MemberEntity, MemberDetailsDto>().ReverseMap();
-            CreateMap<MemberEntity, MemberDetailsExtendedDto>().ReverseMap();
+            CreateMap<MemberEntity, MemberDetailsExtendedDto>()
+                .IncludeBase<MemberEntity, MemberDetailsDto>()                        // reaproveita o mapeamento básico
+                .ForMember(dest => dest.IdUserNavigation,                             // popula a navegação para o utilizador
+                    opt  => opt.MapFrom(src => src.IdUserEntityNavigation))
+                .ReverseMap();
+
             CreateMap<MemberEntity, MemberUpdateDto>().ReverseMap()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             // Project
             CreateMap<ProjectEntity, ProjectCreateDto>().ReverseMap();
-            CreateMap<ProjectEntity, ProjectDetailsDto>().ReverseMap();
-            CreateMap<ProjectEntity, ProjectDetailsExtendedDto>().ReverseMap();
+
+            CreateMap<ProjectEntity, ProjectDetailsDto>()
+                .ReverseMap()
+                .ForMember(dest => dest.Responsavel, opt => opt.Ignore()) // ← proteção do responsável
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<ProjectEntity, ProjectDetailsExtendedDto>()
+                .IncludeBase<ProjectEntity, ProjectDetailsDto>()                      // reaproveita o mapeamento de ProjectDetailsDto
+                .ForMember(dest => dest.ResponsavelNavigation,                        // popula o responsável
+                    opt  => opt.MapFrom(src => src.ResponsavelNavigation))
+                .ForMember(dest => dest.Membros,                                      // mapeia a lista de membros
+                    opt  => opt.MapFrom(src => src.Membros));
+
             CreateMap<ProjectEntity, ProjectUpdateDto>().ReverseMap()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
 
             // Task
             CreateMap<TaskEntity, TaskCreateDto>().ReverseMap();

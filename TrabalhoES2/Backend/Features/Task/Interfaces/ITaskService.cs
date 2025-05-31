@@ -12,11 +12,13 @@ namespace Backend.Features.Task.Interfaces
         System.Threading.Tasks.Task UpdateAsync(int id, TaskUpdateDto dto);
         System.Threading.Tasks.Task DeleteAsync(int id);
 
-        Task<PagedResult<TaskDetailsDto>> GetByUserPagedAsync(int userId, int page, int pageSize, string?
-            orderBy = null, bool descending = false, TaskFilterDto filters = null);
+        Task<PagedResult<TaskDetailsDto>> GetByUserPagedAsync(int userId, int page, int pageSize, string? orderBy = null, bool descending = false, TaskFilterDto filters = null);
         Task<IEnumerable<TaskDetailsDto>> GetByProjetoIdAsync(int projetoId);
+
+        // ➡️ Método para associar uma tarefa a um projeto
+        System.Threading.Tasks.Task AssociateTaskToProjectAsync(int taskId, int projectId);
+        System.Threading.Tasks.Task ConcluirTarefaAsync(int taskId, int userId);
+        
+        System.Threading.Tasks.Task DisassociateTaskFromProjectAsync(int taskId, int projectId);
     }
 }
-
-
-

@@ -23,6 +23,16 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(WorkspaceLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <MudText Typo="Typo.h5" Class="text-center mt-5">Página não encontrada.</MudText>
+    </NotFound>
+</Router>
+
 @code {
     protected override async Task OnInitializedAsync()
     {

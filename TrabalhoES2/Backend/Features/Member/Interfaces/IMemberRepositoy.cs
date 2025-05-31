@@ -12,6 +12,12 @@ namespace Backend.Features.Member.Interfaces
         System.Threading.Tasks.Task DeleteAsync(int id);
         Task<IEnumerable<MemberEntity>> FilteredListAsync(MemberFilterDto filter);
         Task<PagedResult<MemberEntity>> FilteredPagedAsync(MemberFilterDto filter, int page, int pageSize);
+        
+        System.Threading.Tasks.Task RemoveFromProjectAsync(int projectId, int userId);
+        System.Threading.Tasks.Task RemoveFromTaskAsync(int taskId, int userId);
+        Task<bool> ExistsAsync(int projectId, int userId);
+        Task<IEnumerable<MemberEntity>> GetPendingInvitationsAsync(int userId);
+
     }
 }
 

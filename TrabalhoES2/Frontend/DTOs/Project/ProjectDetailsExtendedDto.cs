@@ -7,6 +7,7 @@ namespace Frontend.DTOs.Project
     {
         public UserDetailsDto ResponsavelNavigation { get; set; } = null!;
 
-        public List<MemberDetailsDto> Membros { get; set; } = new();
+        public List<MemberDetailsExtendedDto> Membros { get; set; } = new();
+
     }
 }

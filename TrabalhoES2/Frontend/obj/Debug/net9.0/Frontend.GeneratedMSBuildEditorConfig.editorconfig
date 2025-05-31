@@ -16,97 +16,117 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = browser
 build_property.RootNamespace = Frontend
 build_property.RootNamespace = Frontend
-build_property.ProjectDir = C:\Users\User\Desktop\ESII_SGSC\Frontend\
+build_property.ProjectDir = C:\Users\User\Desktop\TrabalhoES2\Frontend\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = false
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\User\Desktop\ESII_SGSC\Frontend
+build_property.MSBuildProjectDirectory = C:\Users\User\Desktop\TrabalhoES2\Frontend
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/App.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Projects/CreateProjectDialog.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Components/Members/MemberInvitationList.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xNZW1iZXJzXE1lbWJlckludml0YXRpb25MaXN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Components/Projects/CreateProjectDialog.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQcm9qZWN0c1xDcmVhdGVQcm9qZWN0RGlhbG9nLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Tasks/CreateTaskDialog.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Components/Projects/ProjectEditDialog.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQcm9qZWN0c1xQcm9qZWN0RWRpdERpYWxvZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Components/Projects/ProjectTaskAssociation.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQcm9qZWN0c1xQcm9qZWN0VGFza0Fzc29jaWF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Components/Tasks/CreateTaskDialog.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xUYXNrc1xDcmVhdGVUYXNrRGlhbG9nLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Tasks/TaskCard.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Components/Tasks/InviteToTaskDialog.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xUYXNrc1xJbnZpdGVUb1Rhc2tEaWFsb2cucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Components/Tasks/TaskCard.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xUYXNrc1xUYXNrQ2FyZC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Components/Test.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Components/Test.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xUZXN0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/CreateAccount.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/CreateAccount.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3JlYXRlQWNjb3VudC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Dashboard.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/Dashboard.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Home.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/InviteMember.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/Invitations.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52aXRhdGlvbnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/InviteMember.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52aXRlTWVtYmVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Login.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/NotFoundPage.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/NotFoundPage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm90Rm91bmRQYWdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/ProjectDetails.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/PendingInvitations.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGVuZGluZ0ludml0YXRpb25zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/ProjectDetails.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvamVjdERldGFpbHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/ProjectEdit.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvamVjdEVkaXQucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Projects.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/Projects.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvamVjdHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/TaskDetails.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/TaskDetails.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGFza0RldGFpbHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/Tasks.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/Tasks.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGFza3MucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Pages/UpdateProfile.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Pages/UpdateProfile.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXBkYXRlUHJvZmlsZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/_Imports.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Layout/HomeLayout.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Layout/HomeLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XEhvbWVMYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-zq8z4w347q
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Layout/SubMainLayout.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Layout/SubMainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XFN1Yk1haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-wnklbsluhz
 
-[C:/Users/User/Desktop/ESII_SGSC/Frontend/Layout/WorkspaceLayout.razor]
+[C:/Users/User/Desktop/TrabalhoES2/Frontend/Layout/WorkspaceLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XFdvcmtzcGFjZUxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-zduczdhzp9

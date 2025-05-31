@@ -1,4 +1,5 @@
 ﻿using Frontend.DTOs.Project;
+using Frontend.DTOs.Task;
 using Frontend.DTOs.User;
 
 namespace Frontend.DTOs.Member
@@ -7,5 +8,6 @@ namespace Frontend.DTOs.Member
     {
         public UserDetailsDto IdUserNavigation { get; set; } = null!;
         public ProjectDetailsDto IdProjectNavigation { get; set; } = null!;
+        public TaskDetailsDto? IdTaskNavigation { get; set; }
     }
 }

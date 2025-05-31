@@ -1,0 +1,50 @@
+﻿@page "/invitations"
+@using Blazored.LocalStorage
+@using Frontend.Components.Members
+@layout WorkspaceLayout
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<PageTitle>Convites</PageTitle>
+
+<div class="d-flex flex-column align-center justify-center w-100 pt-8">
+    <div style="width:90%">
+        <!-- CABEÇALHO -->
+        <MudPaper Class="pa-4 mb-6 d-flex align-items-center justify-between"
+                  Elevation="1"
+                  Style="background:#fff;border-radius:12px;min-height:120px">
+            <MudText Typo="Typo.h4" Class="mb-0" Color="Color.Primary">Convites</MudText>
+        </MudPaper>
+
+        @if (_userId.HasValue)
+        {
+            <MemberInvitationList UserId="@_userId.Value" OnInvitationResponded="HandleInvitationResponded" />
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Warning">Utilizador não autenticado.</MudAlert>
+        }
+    </div>
+</div>
+
+@code {
+    private int? _userId;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _userId = await LocalStorage.GetItemAsync<int?>("user_id");
+        
+        if (!_userId.HasValue)
+        {
+            Snackbar.Add("Utilizador não autenticado.", Severity.Warning);
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+    
+    private void HandleInvitationResponded()
+    {
+        // Atualizar a interface após responder a um convite
+        StateHasChanged();
+    }
+}

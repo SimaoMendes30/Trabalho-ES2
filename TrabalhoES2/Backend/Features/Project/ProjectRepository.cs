@@ -23,9 +23,13 @@ public sealed class ProjectRepository : IProjectRepository
     {
         await using var ctx = _factory.CreateDbContext();
         return await ctx.Projeto
-            .Include(p => p.ResponsavelNavigation)
-            .FirstOrDefaultAsync(p => p.IdProjeto == id);
+            .Include(p => p.ResponsavelNavigation) // ← ESSENCIAL para popular o campo
+            .Include(p => p.Membros)               // ← SE necessário para o ExtendedDto
+            .ThenInclude(m => m.IdUserEntityNavigation)
+            .FirstOrDefaultAsync(p => p.IdProjeto == id && !p.IsDeleted); // ← evita projetos apagados
     }
+
+
 
     public async System.Threading.Tasks.Task AddAsync(ProjectEntity project)
     {

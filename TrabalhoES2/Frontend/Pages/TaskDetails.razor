@@ -1,5 +1,6 @@
 ﻿@page "/task/{TaskId:int}"
 @using Blazored.LocalStorage
+@using Frontend.Components.Projects
 @using Frontend.DTOs.Task
 @using Frontend.DTOs.Project
 @using Frontend.DTOs.User
@@ -58,6 +59,11 @@
                         <MudText Typo="Typo.caption"><b>Preço/h:</b> @(_task.PrecoHora.HasValue ? _task.PrecoHora.Value.ToString("C") : "N/D")</MudText>
                     </MudStack>
                 </MudStack>
+
+                <!-- Botão de Associar Projeto -->
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="mt-4" Size="@Size.Small" OnClick="OpenProjectAssociationDialog">
+                    Associar Projeto
+                </MudButton>
             </MudPaper>
         }
     </div>
@@ -70,6 +76,7 @@
 
     private TaskDetailsExtendedDto? _task;
     private UserDetailsDto? _responsavel;
+    private List<ProjectDetailsDto> _projetos = new(); // <- Mudei para ProjectDetailsDto
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,15 +88,24 @@
             return;
         }
 
-        var taskTask = TaskService.GetByIdAsync(TaskId);
-        
-        await Task.WhenAll(taskTask);
-
-        _task = taskTask.Result;
-
-        if (_task != null)
+        try
         {
-            _responsavel = _task.ResponsavelNavigation;
+            var taskTask = TaskService.GetByIdAsync(TaskId);
+            var projetosTask = ProjectService.GetAllAsync();
+
+            await Task.WhenAll(taskTask, projetosTask);
+
+            _task = taskTask.Result;
+            _projetos = projetosTask.Result?.ToList() ?? new List<ProjectDetailsDto>();
+
+            if (_task != null)
+            {
+                _responsavel = _task.ResponsavelNavigation;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao carregar dados: {ex.Message}", Severity.Error);
         }
     }
 
@@ -112,6 +128,25 @@
             {
                 Snackbar.Add($"Erro ao remover a tarefa: {ex.Message}", Severity.Error);
             }
+        }
+    }
+
+    private async Task OpenProjectAssociationDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            ["TaskId"] = TaskId
+        };
+
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = DialogService.Show<ProjectTaskAssociation>("Associar Projeto", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Snackbar.Add("Projeto associado com sucesso!", Severity.Success);
+            await OnInitializedAsync();
         }
     }
 }

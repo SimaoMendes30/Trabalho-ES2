@@ -9,5 +9,7 @@
         public DateTimeOffset? DataEstado { get; set; }
         public string EstadoConvite { get; set; } = null!;
         public string? EstadoAtividade { get; set; }
+        
+        public int? IdTarefa { get; set; }
     }
 }

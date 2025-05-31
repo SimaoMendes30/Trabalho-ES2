@@ -864,3 +864,4 @@ C:\Users\User\Desktop\TrabalhoES2\Backend\obj\Debug\net9.0\Backend.genruntimecon
 C:\Users\User\Desktop\TrabalhoES2\Backend\obj\Debug\net9.0\ref\Backend.dll
 C:\Users\diogo\Desktop\ESII_SGSC\Backend\obj\Debug\net9.0\Backend.sourcelink.json
 C:\Users\User\Desktop\ESII_SGSC\Backend\obj\Debug\net9.0\Backend.sourcelink.json
+C:\Users\User\Desktop\TrabalhoES2\Backend\obj\Debug\net9.0\Backend.sourcelink.json
