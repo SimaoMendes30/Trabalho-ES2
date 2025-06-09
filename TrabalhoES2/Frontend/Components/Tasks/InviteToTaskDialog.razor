@@ -1,0 +1,54 @@
+﻿@using MudBlazor
+@using Frontend.DTOs.Task
+@using Frontend.DTOs.User
+@using Frontend.Services
+@inherits ComponentBase
+@inject MemberService MemberService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public int ProjetoId { get; set; }
+    [Parameter] public List<TaskDetailsDto> Tarefas { get; set; } = new();
+    [Parameter] public List<UserDetailsDto> Utilizadores { get; set; } = new();
+
+    private int selectedTaskId;
+    private int selectedUserId;
+
+    private async Task Invite()
+    {
+        if (selectedTaskId > 0 && selectedUserId > 0)
+        {
+            await MemberService.InviteToTaskAsync(selectedUserId, selectedTaskId, ProjetoId);
+            Snackbar.Add("Membro convidado com sucesso para a tarefa.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Snackbar.Add("Selecione uma tarefa e um utilizador.", Severity.Warning);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
+<MudDialog>
+    <MudDialogTitle>Convidar Membro para Tarefa</MudDialogTitle>
+    <MudDialogContent>
+        <MudSelect T="int" Label="Tarefa" @bind-Value="selectedTaskId" FullWidth>
+            @foreach (var t in Tarefas)
+            {
+                <MudSelectItem Value="@t.IdTarefa">@t.Titulo</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect T="int" Label="Utilizador" @bind-Value="selectedUserId" FullWidth Class="mt-4">
+            @foreach (var u in Utilizadores)
+            {
+                <MudSelectItem Value="@u.IdUtilizador">@u.Nome</MudSelectItem>
+            }
+        </MudSelect>
+    </MudDialogContent>
+    <MudDialogActions>
+        <MudButton OnClick="Cancel" Color="Color.Default">Cancelar</MudButton>
+        <MudButton OnClick="Invite" Color="Color.Primary" Variant="Variant.Filled">Convidar</MudButton>
+    </MudDialogActions>
+</MudDialog>

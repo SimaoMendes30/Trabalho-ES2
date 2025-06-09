@@ -1,0 +1,36 @@
+@using MudBlazor
+
+<!-- EditRoleDialog -->
+<MudDialogContent>
+    <MudText Typo="Typo.h6">Alterar papel</MudText>
+
+    <MudSelect T="string"
+               @bind-Value="SelectedRole"
+               Class="mt-4"
+               Variant="Variant.Filled">
+        @foreach (var role in Roles)
+        {
+            <MudSelectItem Value="@role">@role</MudSelectItem>
+        }
+    </MudSelect>
+</MudDialogContent>
+
+<MudDialogActions>
+    <MudButton OnClick="Submit" Color="Color.Primary">Guardar</MudButton>
+    <MudButton OnClick="Cancel">Cancelar</MudButton>
+</MudDialogActions>
+
+@code {
+    // ► Referência ao diálogo (v8+)
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] public string CurrentRole { get; set; } = string.Empty;
+    [Parameter] public string[] Roles      { get; set; } = new[] { "User", "Admin", "SuperUser" };
+
+    private string SelectedRole = string.Empty;
+
+    protected override void OnInitialized() => SelectedRole = CurrentRole;
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(SelectedRole));
+    private void Cancel() => MudDialog.Cancel();
+}

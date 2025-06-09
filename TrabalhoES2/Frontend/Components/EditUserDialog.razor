@@ -1,0 +1,107 @@
+@using MudBlazor
+@using Frontend.DTOs.User
+@using Frontend.Services
+
+@namespace Frontend.Components  
+
+@inject ISnackbar      Snackbar
+@inject AdminService   AdminService  
+
+<MudDialog>
+    <DialogContent>
+        @if (_editContext is not null)
+        {
+            <EditForm EditContext="_editContext">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+                <MudStack Spacing="2">
+                    <MudTextField T="string"
+                                  Label="Nome"
+                                  Variant="Variant.Outlined"
+                                  @bind-Value="Utilizador.Nome"
+                                  Required="true"
+                                  FullWidth="true"/>
+
+                    <MudTextField T="string"
+                                  Label="Username"
+                                  Variant="Variant.Outlined"
+                                  @bind-Value="Utilizador.Username"
+                                  Required="true"
+                                  FullWidth="true"/>
+
+                    <MudSwitch T="bool"
+                               @bind-Checked="Utilizador.Admin"
+                               Color="Color.Primary"
+                               Label="Admin" />
+
+                    <MudSwitch T="bool"
+                               @bind-Checked="Utilizador.SuperUser"
+                               Color="Color.Primary"
+                               Label="User Manager" />
+                </MudStack>
+            </EditForm>
+        }
+        else
+        {
+            <MudProgressCircular Indeterminate Color="Color.Primary"/>
+        }
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Primary"
+                   OnClick="Submit"
+                   Disabled="_editContext is null">
+            Guardar
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter]          public int                UserId    { get; set; }
+
+    private UserUpdateDto Utilizador = new();
+    private EditContext?  _editContext;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var detalhes = await AdminService.GetUserByIdAsync(UserId);
+
+        if (detalhes is null)
+        {
+            Snackbar.Add("Utilizador não encontrado.", Severity.Error);
+            MudDialog.Cancel();
+            return;
+        }
+
+        Utilizador = new UserUpdateDto
+        {
+            Nome       = detalhes.Nome,
+            Username   = detalhes.Username,
+            Admin      = detalhes.Admin,
+            SuperUser  = detalhes.SuperUser
+        };
+
+        _editContext = new EditContext(Utilizador);
+    }
+
+    private async Task Submit()
+    {
+        if (_editContext?.Validate() != true)
+            return;
+
+        try
+        {
+            await AdminService.UpdateUserAsync(UserId, Utilizador);
+            Snackbar.Add("Utilizador atualizado com sucesso.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao atualizar: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

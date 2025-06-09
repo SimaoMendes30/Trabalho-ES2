@@ -1,0 +1,168 @@
+﻿@using System.IdentityModel.Tokens.Jwt
+@using Blazored.LocalStorage
+@using Frontend.Services
+@using Microsoft.Extensions.Logging
+@using MudBlazor
+@inherits LayoutComponentBase
+
+@inject ILocalStorageService LocalStorage
+@inject UserService         UserService
+@inject NavigationManager   NavigationManager
+@inject AuthService         AuthService
+@inject ILogger<WorkspaceLayout> Logger
+
+<div class="page-container">
+    <MudLayout>
+        <!-- ▸ DRAWER ◂ -->
+        <MudDrawer @bind-Open="_drawerOpen"
+                   ClipMode="DrawerClipMode.Never"
+                   Variant="DrawerVariant.Temporary">
+
+            <MudNavMenu>
+                <MudNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Dashboard" Match="NavLinkMatch.All">
+                    Dashboard
+                </MudNavLink>
+                <MudNavLink Href="/projects" Icon="@Icons.Material.Filled.Folder">
+                    Projetos
+                </MudNavLink>
+                <MudNavLink Href="/tasks" Icon="@Icons.Material.Filled.Checklist">
+                    Tarefas
+                </MudNavLink>
+                <MudNavLink Href="/reports" Icon="@Icons.Material.Filled.Assessment">
+                    Relatórios
+                </MudNavLink>
+                <MudNavLink Href="/pending-invitations" Icon="@Icons.Material.Filled.MailOutline">
+                    Pedidos Pendentes
+                </MudNavLink>
+
+                @* Secção extra – apenas para Admin ou UserManager *@
+                @if (_isAdmin || _isUserManager)
+                {
+                    <MudDivider Class="my-2" />
+                    <MudText Typo="Typo.subtitle2" Class="ml-4 mt-1">Administração</MudText>
+
+                    <MudNavLink Href="/admin/users"
+                                Icon="@Icons.Material.Filled.ManageAccounts"
+                                Match="NavLinkMatch.All">
+                        Gestão de Utilizadores
+                    </MudNavLink>
+
+                    <MudNavLink Href="/manage-users"
+                                Icon="@Icons.Material.Filled.SupervisorAccount"
+                                Match="NavLinkMatch.All">
+                        User Manager
+                    </MudNavLink>
+                }
+            </MudNavMenu>
+        </MudDrawer>
+
+        <!-- ▸ MAIN ◂ -->
+        <MudMainContent>
+            <MudAppBar Color="Color.Default" Elevation="3">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                               Edge="Edge.Start"
+                               Color="Color.Dark"
+                               OnClick="@ToggleDrawer" />
+
+                <MudLink Href="/dashboard" Underline="Underline.None" Class="ml-2">
+                    <MudImage Src="images/helpmate-logo2.png"
+                              Width="200" Height="60"
+                              Alt="Logótipo da aplicação Help Mate"
+                              Class="rounded-lg" />
+                </MudLink>
+
+                <div style="flex-grow:1;"></div>
+
+                @if (!string.IsNullOrWhiteSpace(_userName))
+                {
+                    <MudMenu OffsetY="true">
+                        <ActivatorContent>
+                            <div style="display:flex;align-items:center;padding:8px 12px;border-radius:6px;cursor:pointer;">
+                                <MudAvatar Size="Size.Medium"
+                                           Color="Color.Info"
+                                           Variant="Variant.Outlined"
+                                           Class="mr-2">
+                                    @_userLetter
+                                </MudAvatar>
+                                <div>
+                                    <MudText Typo="Typo.caption" Class="m-0">Olá!</MudText>
+                                    <MudText Typo="Typo.subtitle2" Class="m-0" Style="font-weight:bold;">
+                                        @_userName
+                                    </MudText>
+                                </div>
+                            </div>
+                        </ActivatorContent>
+                        <ChildContent>
+                            <MudMenuItem OnClick="@GoToProfile">
+                                <MudIcon Icon="@Icons.Material.Filled.AccountCircle" /> Perfil
+                            </MudMenuItem>
+                            <MudMenuItem OnClick="@Logout">
+                                <MudIcon Icon="@Icons.Material.Filled.ExitToApp" /> Sair
+                            </MudMenuItem>
+                        </ChildContent>
+                    </MudMenu>
+                }
+            </MudAppBar>
+
+            <div style="display:flex;justify-content:center;width:100%;min-height:100vh;">
+                <div class="glass-side"></div>
+
+                <div style="flex:2;padding:2rem;">
+                    @Body
+                </div>
+
+                <div class="glass-side"></div>
+            </div>
+        </MudMainContent>
+    </MudLayout>
+</div>
+
+@code {
+    /* ------------------------------ state ------------------------------ */
+    private bool   _drawerOpen;
+    private string? _userName;
+    private string? _userLetter;
+
+    private bool _isAdmin;
+    private bool _isUserManager;
+
+    /* ------------------------------ life-cycle ------------------------------ */
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var token = await LocalStorage.GetItemAsync<string>("auth_token");
+            if (string.IsNullOrWhiteSpace(token))
+                return;
+
+            var jwt     = new JwtSecurityTokenHandler().ReadJwtToken(token);
+            var idClaim = jwt.Claims.FirstOrDefault(c => c.Type == "nameid");
+
+            if (idClaim != null && int.TryParse(idClaim.Value, out var userId))
+            {
+                var user = await UserService.GetByIdAsync(userId);
+                if (user != null)
+                {
+                    _userName      = user.Nome;
+                    _userLetter    = string.IsNullOrEmpty(user.Nome) ? "?" : user.Nome[0].ToString().ToUpper();
+                    _isAdmin       = user.Admin;
+                    _isUserManager = user.SuperUser;   // ajuste se o flag for diferente
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Erro ao carregar dados do utilizador autenticado.");
+        }
+    }
+
+    /* ------------------------------ handlers ------------------------------ */
+    void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+    void GoToProfile()  => NavigationManager.NavigateTo("/profile");
+
+    async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        NavigationManager.NavigateTo("/login");
+    }
+}

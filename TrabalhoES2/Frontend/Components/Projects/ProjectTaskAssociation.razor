@@ -1,0 +1,120 @@
+﻿@using Frontend.DTOs.Task
+@using Frontend.DTOs.Project
+@using Frontend.Services
+@using MudBlazor
+
+@inject TaskService TaskService
+@inject ProjectService ProjectService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6" Class="mb-4">Associar Tarefa ao Projeto</MudText>
+        
+        @if (_isLoading)
+        {
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+        }
+        else
+        {
+            <MudSelect T="int" Label="Selecione o Projeto" 
+                       @bind-Value="_selectedProjectId" 
+                       Required="true"
+                       FullWidth="true">
+                @foreach (var project in _projects)
+                {
+                    <MudSelectItem Value="@project.IdProjeto">@project.Nome</MudSelectItem>
+                }
+            </MudSelect>
+            
+            <MudCheckBox T="bool" @bind-Checked="_useProjectRate" 
+                         Label="Usar preço/hora do projeto" 
+                         Color="Color.Primary"
+                         Class="mt-4" />
+
+            @if (_selectedProject != null && _useProjectRate)
+            {
+                <MudText Typo="Typo.body2" Class="mt-2">
+                    Preço/hora do projeto: @(_selectedProject.PrecoHora?.ToString("C") ?? "Não definido")
+                </MudText>
+            }
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Primary" 
+                   OnClick="Submit" 
+                   Disabled="@(_selectedProjectId == 0 || _isLoading)">
+            Associar
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance? MudDialog { get; set; }
+    [Parameter] public int TaskId { get; set; }
+    
+    private List<ProjectDetailsDto> _projects = new();
+    private int _selectedProjectId;
+    private bool _useProjectRate = true;
+    private bool _isLoading = true;
+    private ProjectDetailsDto? _selectedProject => _projects.FirstOrDefault(p => p.IdProjeto == _selectedProjectId);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProjects();
+    }
+    
+    private async Task LoadProjects()
+    {
+        try
+        {
+            _isLoading = true;
+            var projects = await ProjectService.GetAllAsync(new ProjectFilterDto { IsDeleted = false });
+            
+            if (projects != null)
+            {
+                _projects = projects.ToList();
+                
+                if (_projects.Any())
+                {
+                    _selectedProjectId = _projects.First().IdProjeto;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao carregar projetos: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+    
+    private async Task Submit()
+    {
+        if (_selectedProjectId == 0) return;
+
+        try
+        {
+            _isLoading = true;
+
+            // ✅ Correção: Em vez de fazer um update, faz a associação
+            await TaskService.AssociateTaskToProject(TaskId, _selectedProjectId);
+
+            Snackbar.Add("Tarefa associada ao projeto com sucesso!", Severity.Success);
+            MudDialog?.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao associar tarefa ao projeto: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+    
+    private void Cancel() => MudDialog?.Cancel();
+}

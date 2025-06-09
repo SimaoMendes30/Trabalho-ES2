@@ -1,0 +1,124 @@
+﻿@page "/reports"
+@using MudBlazor
+@inject ReportsService ReportsService
+@inject ILocalStorageService LocalStorage
+
+<MudPaper Class="pa-6 mt-4" Elevation="1">
+    <MudTabs>
+
+        <!-- Horas por Dia -->
+        <MudTabPanel Text="Horas por Dia">
+            <MudTable Items="horasDia">
+                <HeaderContent>
+                    <MudTh>Dia</MudTh>
+                    <MudTh>Total de Horas</MudTh>
+                    <MudTh>Estado</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Date.ToShortDateString()</MudTd>
+                    <MudTd>@context.TotalHours.ToString("0.00")</MudTd>
+                    <MudTd>
+                        @if (context.ExceedsLimit)
+                        {
+                            <MudChip T="string" Color="Color.Error">Excesso</MudChip>
+                        }
+                        else
+                        {
+                            <MudChip T="string" Color="Color.Success">Normal</MudChip>
+                        }
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudTabPanel>
+
+        <!-- Horas por Mês -->
+        <MudTabPanel Text="Horas por Mês">
+            <MudTable Items="horasMes">
+                <HeaderContent>
+                    <MudTh>Mês</MudTh>
+                    <MudTh>Total de Horas</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@($"{context.Year}-{context.Month:D2}")</MudTd>
+                    <MudTd>@context.TotalHours.ToString("0.00")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudTabPanel>
+
+        <!-- Custos por Dia -->
+        <MudTabPanel Text="Custos por Dia">
+            <MudTable Items="custosDia">
+                <HeaderContent>
+                    <MudTh>Dia</MudTh>
+                    <MudTh>Total de Custo</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Date.ToShortDateString()</MudTd>
+                    <MudTd>@context.TotalCost.ToString("C")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudTabPanel>
+
+        <!-- Custos por Mês -->
+        <MudTabPanel Text="Custos por Mês">
+            <MudTable Items="custosMes">
+                <HeaderContent>
+                    <MudTh>Mês</MudTh>
+                    <MudTh>Total de Custo</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@($"{context.Year}-{context.Month:D2}")</MudTd>
+                    <MudTd>@context.TotalCost.ToString("C")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudTabPanel>
+
+        <!-- Relatório Detalhado -->
+        <MudTabPanel Text="Relatório Detalhado">
+            <MudTable Items="relatorioDetalhado">
+                <HeaderContent>
+                    <MudTh>Dia</MudTh>
+                    <MudTh>Projeto</MudTh>
+                    <MudTh>Tarefa</MudTh>
+                    <MudTh>Cliente</MudTh>
+                    <MudTh>Utilizadores</MudTh>
+                    <MudTh>Horas</MudTh>
+                    <MudTh>Custo</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Day.ToShortDateString()</MudTd>
+                    <MudTd>@context.Projeto</MudTd>
+                    <MudTd>@context.TituloTarefa</MudTd>
+                    <MudTd>@context.Cliente</MudTd>
+                    <MudTd>@context.Utilizadores</MudTd>
+                    <MudTd>@context.Horas.ToString("0.00")</MudTd>
+                    <MudTd>@context.Custo.ToString("C")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudTabPanel>
+
+    </MudTabs>
+</MudPaper>
+
+@code {
+    private List<ReportHourDayDto> horasDia = new();
+    private List<ReportHourMonthDto> horasMes = new();
+    private List<ReportCostDayDto> custosDia = new();
+    private List<ReportCostMonthDto> custosMes = new();
+    private List<ReportDetailsDto> relatorioDetalhado = new();
+    private int userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userIdFromStorage = await LocalStorage.GetItemAsync<int?>("user_id");
+        if (userIdFromStorage is null) return;
+
+        userId = userIdFromStorage.Value;
+
+        horasDia = await ReportsService.GetHorasPorDiaAsync(userId);
+        horasMes = await ReportsService.GetHorasPorMesAsync(userId);
+        custosDia = await ReportsService.GetCustosPorDiaAsync(userId);
+        custosMes = await ReportsService.GetCustosPorMesAsync(userId);
+        relatorioDetalhado = await ReportsService.GetRelatorioDetalhadoMensalAsync(userId);
+    }
+}

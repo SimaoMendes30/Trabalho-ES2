@@ -1,0 +1,93 @@
+@page "/admin/users"
+@attribute [Authorize(Roles = "Admin")]
+
+@using MudBlazor
+@using Frontend.Services
+@using Frontend.DTOs.User
+@using Frontend.Components
+
+@inject AdminService   AdminService
+@inject IDialogService DialogService
+@inject ISnackbar      Snackbar
+
+<PageTitle>Admin – Utilizadores</PageTitle>
+
+<MudPaper Class="p-4">
+    <MudText Typo="Typo.h5" Class="mb-4">Admin – Utilizadores</MudText>
+
+    <MudTable Items="_users" Dense Hover Loading="_loading">
+        <HeaderContent>
+            <MudTh>Username</MudTh>
+            <MudTh>Papel</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd>@context.Username</MudTd>
+            <MudTd>@GetRole(context)</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                               Color="Color.Primary"
+                               OnClick="() => EditUser(context)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                               Color="Color.Error"
+                               OnClick="() => DeleteUser(context)" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private List<UserDetailsDto> _users = new();
+    private bool _loading;
+
+    protected override async Task OnInitializedAsync() => await RefreshAsync();
+
+    private async Task RefreshAsync()
+    {
+        _loading = true;
+        _users   = await AdminService.GetAllUsersAsync();
+        _loading = false;
+    }
+
+    /*----------- helpers -----------*/
+    private static string GetRole(UserDetailsDto u) =>
+        u.Admin ? "Admin" : (u.SuperUser ? "SuperUser" : "User");
+
+    /*----------- actions -----------*/
+    private async Task EditUser(UserDetailsDto user)
+    {
+        var parameters = new DialogParameters
+        {
+            ["UserId"] = user.IdUtilizador
+        };
+
+        var dialog = DialogService.Show<EditUserDialog>("Editar utilizador", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+            await RefreshAsync();          // volta a buscar a lista → tabela actualiza
+    }
+
+
+    private async Task DeleteUser(UserDetailsDto user)
+    {
+        var confirm = await DialogService.ShowMessageBox(
+            "Confirmar",
+            $"Eliminar {user.Username}?",
+            yesText: "Eliminar",
+            cancelText: "Cancelar");
+
+        if (confirm == true)
+        {
+            await AdminService.DeleteUserAsync(user.IdUtilizador);
+
+            // ► actualiza só a lista em memória
+            _users.RemoveAll(u => u.IdUtilizador == user.IdUtilizador);
+            Snackbar.Add("Utilizador eliminado", Severity.Success);
+
+            StateHasChanged();   // força o re-render da tabela
+        }
+    }
+
+}

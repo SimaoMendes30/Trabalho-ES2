@@ -1,0 +1,75 @@
+@page "/manage-users"
+@attribute [Authorize]
+
+@using MudBlazor
+@using Frontend.Services
+@using Frontend.DTOs.User    <!-- namespace exacto do DTO -->
+@using Frontend.Components  <!-- onde está o EditRoleDialog -->
+
+@inject UserManagerService UserManagerService
+@inject IDialogService     DialogService
+@inject ISnackbar          Snackbar
+
+<PageTitle>Gestão de Utilizadores</PageTitle>
+
+<MudPaper Class="p-4">
+    <MudText Typo="Typo.h5" Class="mb-4">Gestão de Utilizadores</MudText>
+
+    <MudTable Items="_users" Dense Hover Loading="_loading">
+        <HeaderContent>
+            <MudTh>Username</MudTh>
+            <MudTh>Papel</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd>@context.Username</MudTd>
+            <MudTd>@GetRole(context)</MudTd>
+            <MudTd>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           OnClick="() => ChangeRole(context)">
+                    Alterar
+                </MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private List<UserDetailsDto> _users = new();
+    private bool _loading;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _users   = await UserManagerService.GetAllAsync();
+        _loading = false;
+    }
+
+    /*----------- helpers -----------*/
+    private static string GetRole(UserDetailsDto u) =>
+        u.Admin ? "Admin" : (u.SuperUser ? "SuperUser" : "User");
+
+    /*----------- actions -----------*/
+    private async Task ChangeRole(UserDetailsDto user)
+    {
+        var parameters = new DialogParameters
+        {
+            [nameof(EditRoleDialog.CurrentRole)] = GetRole(user)
+        };
+
+        var dialog = DialogService.Show<EditRoleDialog>("Alterar papel", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)                       // grafia nova
+        {
+            var newRole = (string)result.Data!;
+            await UserManagerService.UpdateRoleAsync(user.IdUtilizador, newRole);
+            Snackbar.Add("Papel atualizado com sucesso", Severity.Success);
+            await LoadAsync();
+        }
+    }
+}

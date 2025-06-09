@@ -1,0 +1,27 @@
+﻿@inject IJSRuntime JS
+@using Frontend.Themes
+@using static Themes.SGSCThemes
+
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(WorkspaceLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(HomeLayout)">
+            <NotFoundPage />
+        </LayoutView>
+    </NotFound>
+</Router>
+
+<MudThemeProvider Theme="@DefaultTheme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await SGSCThemes.ApplyThemeToCssVarsAsync(JS);
+    }
+}
